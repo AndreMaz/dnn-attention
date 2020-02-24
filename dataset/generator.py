@@ -38,3 +38,4 @@ def generate(minYear: int, maxYear: int) -> list:
         dates.append(date)
 
     return dates
+
