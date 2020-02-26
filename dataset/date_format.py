@@ -1,6 +1,7 @@
 import datetime
 import pandas as pd
 # import tensorflow as tf
+import numpy as np
 
 MONTH_NAMES_FULL = [
     "January",
@@ -170,6 +171,53 @@ def dateTupleToYYYYDashMMDashDD(dateTuple: list) -> str:
     monthStr = toTwoDigitString(dateTuple[1])
     dayStr = toTwoDigitString(dateTuple[2])
     return f"{dateTuple[0]}-{monthStr}-{dayStr}"
+
+INPUT_FNS = [
+  dateTupleToDDMMMYYYY,
+  dateTupleToMMDDYY,
+  dateTupleToMMSlashDDSlashYY,
+  dateTupleToMMSlashDDSlashYYYY,
+  dateTupleToMSlashDSlashYYYY,
+  dateTupleToDDDashMMDashYYYY,
+  dateTupleToDDashMDashYYYY,
+  dateTupleToMMMSpaceDDSpaceYY,
+  dateTupleToMSlashDSlashYY,
+  dateTupleToMMMSpaceDDSpaceYYYY,
+  dateTupleToMMMSpaceDDCommaSpaceYY,
+  dateTupleToMMMSpaceDDCommaSpaceYYYY,
+  dateTupleToDDDotMMDotYYYY,
+  dateTupleToDDotMDotYYYY,
+  dateTupleToYYYYDotMMDotDD,
+  dateTupleToYYYYDotMDotD,
+  dateTupleToYYYYMMDD,
+  dateTupleToYYYYDashMDashD,
+  dateTupleToDSpaceMMMSpaceYYYY,
+  dateTupleToYYYYDashMMDashDD
+]
+
+def encodeInputDateStrings(dateStrings: list):
+    numStrings = len(dateStrings)
+    x = np.zeros((numStrings, INPUT_LENGTH))
+
+    for i, value in enumerate(dateStrings):
+        for j in range(INPUT_LENGTH):
+            char = dateStrings[i][j]
+            index = INPUT_VOCAB.index(char)
+            x[i,j] = index
+
+    return x
+
+def encodeOutputDateStrings(dateStrings: list):
+    numStrings = len(dateStrings)
+    x = np.zeros((numStrings, OUTPUT_LENGTH), dtype='int32')
+
+    for i, value in enumerate(dateStrings):
+        for j in range(OUTPUT_LENGTH):
+            char = dateStrings[i][j]
+            index = OUTPUT_VOCAB.index(char)
+            x[i,j] = index
+
+    return x
 
 def generate(minYear: int, maxYear: int) -> list:
     daterange = pd.date_range(minYear, maxYear)
