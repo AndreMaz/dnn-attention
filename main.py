@@ -1,7 +1,8 @@
 # import dataset.generator
 from dataset.date_format import INPUT_VOCAB, OUTPUT_VOCAB, INPUT_LENGTH, OUTPUT_LENGTH
 from dataset import generator
-from models.seq2seq.seq2seq import createModel
+# from models.seq2seq.model import createModel
+from models.luong.model import createModel
 
 minYear = '1950-01-01'
 maxYear = '2050-01-01'
