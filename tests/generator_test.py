@@ -22,7 +22,7 @@ class TestStringMethods(unittest.TestCase):
     #         s.split(2)
 
     def test_generate(self):
-        result = generator.generate('1950-01-01', '1950-02-01')
+        result = generator.generateOrderedDates('1950-01-01', '1950-02-01')
         self.assertEqual(len(result), 32)
 
 if __name__ == '__main__':

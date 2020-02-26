@@ -21,10 +21,6 @@ class TestStringMethods(unittest.TestCase):
     #     with self.assertRaises(TypeError):
     #         s.split(2)
 
-    # def test_generate(self):
-    #    result = date_format.generate('1950-01-01', '1950-02-01')
-    #    self.assertEqual(len(result), 32)
-
     def test_first3letters(self):
         result = date_format.first3Letters(date_format.MONTH_NAMES_FULL)
         self.assertEqual(len(result), 12)
@@ -131,9 +127,9 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual(len(date_format.INPUT_FNS), 20)
 
     def test_encodeInputDateStrings(self):
-        dateStrings = ["1 AUG 2020  "]
+        dateStrings = ["1 AUG 2020"]
         actual = date_format.encodeInputDateStrings(dateStrings)
-        expected = [[ 2., 15., 16., 32., 22., 15., 3., 1., 3., 1., 15., 15.]]
+        expected = [[ 2., 15., 16., 32., 22., 15., 3., 1., 3., 1., 0., 0.]]
         
         self.assertTrue(np.all(actual == expected))
 

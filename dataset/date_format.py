@@ -201,9 +201,10 @@ def encodeInputDateStrings(dateStrings: list):
 
     for i, value in enumerate(dateStrings):
         for j in range(INPUT_LENGTH):
-            char = dateStrings[i][j]
-            index = INPUT_VOCAB.index(char)
-            x[i,j] = index
+            if (j < len(dateStrings[i])):
+                char = dateStrings[i][j]
+                index = INPUT_VOCAB.index(char)
+                x[i,j] = index
 
     return x
 
