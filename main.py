@@ -8,7 +8,7 @@ maxYear = '1951-01-05'
 
 def main(minYear: str, maxYear: str) -> None:
     a = generator.generateDataSet(minYear, maxYear)
-    print(a[500])
+    print(a[50])
     
     # monthList = date_format.first3Letters(date_format.MONTH_NAMES_FULL)
     # print(monthList)

@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
-# import tensorflow as tf
+import tensorflow as tf
 
-from dataset.date_format import INPUT_FNS, encodeInputDateStrings, encodeOutputDateStrings, dateTupleToYYYYDashMMDashDD
+from dataset.date_format import START_CODE, INPUT_FNS, OUTPUT_VOCAB, encodeInputDateStrings, encodeOutputDateStrings, dateTupleToYYYYDashMMDashDD
 
 def generateOrderedDates(minYear: str, maxYear: str) -> list:
     daterange = pd.date_range(minYear, maxYear)
@@ -18,16 +18,42 @@ def generateOrderedDates(minYear: str, maxYear: str) -> list:
     return dates
 
 def dateTuplesToTensor(dateTuples):
-    inputsStrings = []
-
+    ### Encoder Input
+    inputs = []
     for _, fn in enumerate(INPUT_FNS):
         for _, dateTuple in enumerate(dateTuples):
             formatedDate = fn(dateTuple)
-            inputsStrings.append(encodeInputDateStrings(formatedDate))
+            inputs.append(formatedDate)
     
-    return inputsStrings
+    encoderInput = encodeInputDateStrings(inputs)
+    
+    ### Decoder Input
+    isoDates = []
+    for _, dateTuple in enumerate(dateTuples):
+        isoDates.append(dateTupleToYYYYDashMMDashDD(dateTuple))
 
-def generateDataSet(minYear="1950-01-01", maxYear="1950-02-01", trainSplit=0.25, validationSplit=0.15):
+    decoderInput = encodeOutputDateStrings(isoDates).astype("float32")
+
+    # Remove Last column
+    decoderInput = decoderInput[...,:-1]
+    # Create a single column with start code
+    shift = np.full((decoderInput.shape[0], 1), START_CODE, dtype='float32')
+    # Concat the tensors
+    decoderInput = np.concatenate((shift, decoderInput), axis=1)
+    # Tile to match the encoderInput
+    decoderInput = np.tile(decoderInput, (len(INPUT_FNS), 1))
+
+    ### Decoder Output
+    decoderOutput = tf.one_hot(
+        encodeOutputDateStrings(isoDates),
+        len(OUTPUT_VOCAB)
+    )
+    # Tile to match the encoderInput
+    decoderOutput = np.tile(decoderOutput, (len(INPUT_FNS), 1, 1))
+
+    return encoderInput, decoderInput, decoderOutput
+
+def generateDataSet(minYear="1950-01-01", maxYear="2050-01-01", trainSplit=0.25, validationSplit=0.15):
     dateTuples = generateOrderedDates(minYear, maxYear)
 
     np.random.shuffle(dateTuples)
