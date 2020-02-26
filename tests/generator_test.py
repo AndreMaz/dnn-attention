@@ -1,9 +1,7 @@
-import unittest
 import sys
 sys.path.append('.')
 from dataset import generator
-
-
+import unittest
 
 class TestStringMethods(unittest.TestCase):
 
@@ -24,6 +22,7 @@ class TestStringMethods(unittest.TestCase):
     def test_generate(self):
         result = generator.generateOrderedDates('1950-01-01', '1950-02-01')
         self.assertEqual(len(result), 32)
+
 
 if __name__ == '__main__':
     unittest.main()

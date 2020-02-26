@@ -1,26 +1,29 @@
 # import dataset.generator
-from dataset import date_format
+from dataset.date_format import INPUT_VOCAB, OUTPUT_VOCAB, INPUT_LENGTH, OUTPUT_LENGTH
 from dataset import generator
+from models.seq2seq.seq2seq import createModel
 
 minYear = '1950-01-01'
-maxYear = '1951-01-05'
+maxYear = '2050-01-01'
 
 
 def main(minYear: str, maxYear: str) -> None:
-    a = generator.generateDataSet(minYear, maxYear)
-    print(a[50])
-    
-    # monthList = date_format.first3Letters(date_format.MONTH_NAMES_FULL)
-    # print(monthList)
-    # print(date_format.uniqueMonthLetters(monthList))
-    # print(date_format.INPUT_VOCAB)    
+    trainEncoderInput, trainDecoderInput, trainDecoderOutput, valEncoderInput, valDecoderInput, valDecoderOutput, testDateTuples = generator.generateDataSet(
+        minYear, maxYear)
+    # print(trainEncoderInput.shape)
+    # print(trainDecoderInput.shape)
+    # print(trainDecoderOutput.shape)
 
-    # dateTuple = [2050,12,31]
-    # print(date_format.dateTupleToDDMMMYYYY(dateTuple))
-    # dateStrings = ["1 AUG 2020  "]
-    # print(date_format.encodeInputDateStrings(dateStrings))
+    model = createModel(len(INPUT_VOCAB), len(OUTPUT_VOCAB), INPUT_LENGTH, OUTPUT_LENGTH)
+    model.summary()
 
-    # dateStrings = ["2050-12-31"]
-    # print(date_format.encodeOutputDateStrings(dateStrings))
+    model.fit(
+        x = [trainEncoderInput, trainDecoderInput],
+        y = trainDecoderOutput,
+        epochs = 2,
+        batch_size = 128,
+        shuffle = True
+    )
+
 
 main(minYear, maxYear)
