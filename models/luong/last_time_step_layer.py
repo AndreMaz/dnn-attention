@@ -1,4 +1,4 @@
-from tensorflow.keras.layers import Layer
+import tensorflow
 
 class GetLastTimestepLayer(Layer):
     def __init__(self, num_outputs):

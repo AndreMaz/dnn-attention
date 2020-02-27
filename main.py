@@ -27,4 +27,5 @@ def main(minYear: str, maxYear: str) -> None:
     )
 
 
-main(minYear, maxYear)
+if __name__ == "__main__":
+    main(minYear, maxYear)

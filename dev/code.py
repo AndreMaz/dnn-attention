@@ -7,4 +7,5 @@ def myFun(a, b):
     return a+b
 
 
-myFun(2, 2)
+if __name__ == "__main__":
+    myFun(2, 2)
