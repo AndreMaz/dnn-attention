@@ -1,10 +1,8 @@
-import tensorflow
-
+from tensorflow.keras.layers import Layer
+from tensorflow import gather, squeeze
 class GetLastTimestepLayer(Layer):
-    def __init__(self, num_outputs):
+    def __init__(self):
         super(GetLastTimestepLayer, self).__init__()
-        self.num_outputs = num_outputs
-    
+        
     def call(self, input):
-        # inputRank = len(input.shape)
-        return input.gather([input.shape[1]-1], 1).squeeze([1])
+        return squeeze(gather(input, [input.shape[1]-1], axis = 1), axis=[1])

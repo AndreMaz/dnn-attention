@@ -1,6 +1,7 @@
-from tensorflow.keras.layers import Input, Embedding, LSTM, TimeDistributed, Dense
+from tensorflow.keras.layers import Input, Embedding, LSTM, TimeDistributed, Dense, Dot, Activation, Concatenate
 from tensorflow.keras.models import Model
 from models.luong.last_time_step_layer import GetLastTimestepLayer
+
 
 def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength):
     embeddingDims = 64
@@ -11,53 +12,76 @@ def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength):
     print(f"inputLength {inputLength}")
     print(f"outputLength {outputLength}")
 
-    encoderEmbeddingInput = Input(shape=(inputLength,), name='embeddingEncoderInput')
+    # Encoder
+    encoderEmbeddingInput = Input(
+        shape=(inputLength,), name='embeddingEncoderInput')
 
     encoderEmbeddingOutput = Embedding(
         inputVocabSize,
         embeddingDims,
-        input_length = inputLength,
-        mask_zero = True,
-        name = 'encoderEmbedding'
+        input_length=inputLength,
+        mask_zero=True,
+        name='encoderEmbedding'
     )(encoderEmbeddingInput)
 
     encoderLSTMOutput = LSTM(
         lstmUnits,
-        return_sequences = True,
+        return_sequences=True,
         name="encoderLSTM"
     )(encoderEmbeddingOutput)
 
-    encoderLastState = GetLastTimestepLayer(encoderLSTMOutput)
+    # Get last hidden state
+    slicerLayer = GetLastTimestepLayer()
+    encoderLastState = slicerLayer(encoderLSTMOutput)
 
-    decoderEmbeddingInput = Input(shape=(outputLength,), name='embeddingDecoderInput')
+    # Decoder
+    decoderEmbeddingInput = Input(
+        shape=(outputLength,), name='embeddingDecoderInput')
 
     decoderEmbeddingOutput = Embedding(
         outputVocabSize,
         embeddingDims,
-        input_length = outputLength,
-        mask_zero = True,
-        name = 'decoderEmbedding'
+        input_length=outputLength,
+        mask_zero=True,
+        name='decoderEmbedding'
     )(decoderEmbeddingInput)
 
     decoderLSTMOutput = LSTM(
         lstmUnits,
-        return_sequences = True,
+        return_sequences=True,
         name="decoderLSMT"
     )(decoderEmbeddingOutput, initial_state=[encoderLastState, encoderLastState])
 
+    attentionDotLayer = Dot((2, 2), name="attentionDot")
+    attention = attentionDotLayer([decoderLSTMOutput, encoderLSTMOutput])
+
+    activationLayer = Activation("softmax", name="attentionSoftMax")
+    attention = activationLayer(attention)
+
+    contextDotLayer = Dot((2, 1), name="context")
+    context = contextDotLayer([attention, encoderLSTMOutput])
+
+    concatenateLayer = Concatenate(name="combinedContext")
+    decoderCombinedContext = concatenateLayer([context, decoderLSTMOutput])
+
     outputGenerator = TimeDistributed(
-        Dense(outputVocabSize, activation = "softmax"),
-        name = "timeDistributedSoftmax"
-    )(decoderLSTMOutput)
+        Dense(lstmUnits, activation="tanh",),
+        name="timeDistributedTanh"
+    )(decoderCombinedContext)
+
+    outputGenerator = TimeDistributed(
+        Dense(outputVocabSize, activation="softmax"),
+        name="timeDistributedSoftmax"
+    )(outputGenerator)
 
     model = Model(
-        inputs = [encoderEmbeddingInput, decoderEmbeddingInput],
-        outputs = outputGenerator
+        inputs=[encoderEmbeddingInput, decoderEmbeddingInput],
+        outputs=outputGenerator
     )
 
     model.compile(
-        loss = "categorical_crossentropy",
-        optimizer = "Adam"
+        loss="categorical_crossentropy",
+        optimizer="Adam"
     )
 
     return model

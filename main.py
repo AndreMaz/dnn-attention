@@ -21,9 +21,10 @@ def main(minYear: str, maxYear: str) -> None:
     model.fit(
         x = [trainEncoderInput, trainDecoderInput],
         y = trainDecoderOutput,
-        epochs = 2,
+        epochs = 4,
         batch_size = 128,
-        shuffle = True
+        shuffle = True,
+        validation_data = ([valEncoderInput, valDecoderInput], valDecoderOutput )
     )
 
 
