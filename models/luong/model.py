@@ -61,15 +61,15 @@ def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength):
     decoderCombinedContext = Concatenate(
         name="combinedContext")([context, decoderLSTMOutput])
 
-    outputGenerator = TimeDistributed(
-        Dense(lstmUnits, activation="tanh",),
+    outputGeneratorTanh = TimeDistributed(
+        Dense(lstmUnits, activation="tanh"),
         name="timeDistributedTanh"
     )(decoderCombinedContext)
 
     outputGenerator = TimeDistributed(
         Dense(outputVocabSize, activation="softmax"),
         name="timeDistributedSoftmax"
-    )(outputGenerator)
+    )(outputGeneratorTanh)
 
     model = Model(
         inputs=[encoderEmbeddingInput, decoderEmbeddingInput],

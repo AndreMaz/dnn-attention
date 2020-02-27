@@ -52,13 +52,14 @@ def dateTuplesToTensor(dateTuples):
         len(OUTPUT_VOCAB)
     )
     # Tile to match the encoderInput
-    decoderOutput = np.tile(decoderOutput, (len(INPUT_FNS), 1, 1))
+    decoderOutput = np.tile(decoderOutput, (len(INPUT_FNS), 1, 1)).astype("int32")
 
     return encoderInput, decoderInput, decoderOutput
 
 
 def generateDataSet(minYear="1950-01-01", maxYear="2050-01-01", trainSplit=0.25, validationSplit=0.15):
     dateTuples = generateOrderedDates(minYear, maxYear)
+    
     np.random.shuffle(dateTuples)
 
     numTrain = floor(len(dateTuples)*trainSplit)

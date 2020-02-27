@@ -197,7 +197,7 @@ INPUT_FNS = [
 
 def encodeInputDateStrings(dateStrings: list):
     numStrings = len(dateStrings)
-    x = np.zeros((numStrings, INPUT_LENGTH))
+    x = np.zeros((numStrings, INPUT_LENGTH), dtype="float32")
 
     for i, value in enumerate(dateStrings):
         for j in range(INPUT_LENGTH):
