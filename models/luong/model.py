@@ -31,8 +31,7 @@ def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength):
     )(encoderEmbeddingOutput)
 
     # Get last hidden state
-    slicerLayer = GetLastTimestepLayer()
-    encoderLastState = slicerLayer(encoderLSTMOutput)
+    encoderLastState = GetLastTimestepLayer(name="encoderLastStateExtractor")(encoderLSTMOutput)
 
     # Decoder
     decoderEmbeddingInput = Input(
@@ -52,17 +51,15 @@ def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength):
         name="decoderLSMT"
     )(decoderEmbeddingOutput, initial_state=[encoderLastState, encoderLastState])
 
-    attentionDotLayer = Dot((2, 2), name="attentionDot")
-    attention = attentionDotLayer([decoderLSTMOutput, encoderLSTMOutput])
+    attention = Dot((2, 2), name="attentionDot")(
+        [decoderLSTMOutput, encoderLSTMOutput])
 
-    activationLayer = Activation("softmax", name="attentionSoftMax")
-    attention = activationLayer(attention)
+    attention = Activation("softmax", name="attentionSoftMax")(attention)
 
-    contextDotLayer = Dot((2, 1), name="context")
-    context = contextDotLayer([attention, encoderLSTMOutput])
+    context = Dot((2, 1), name="context")([attention, encoderLSTMOutput])
 
-    concatenateLayer = Concatenate(name="combinedContext")
-    decoderCombinedContext = concatenateLayer([context, decoderLSTMOutput])
+    decoderCombinedContext = Concatenate(
+        name="combinedContext")([context, decoderLSTMOutput])
 
     outputGenerator = TimeDistributed(
         Dense(lstmUnits, activation="tanh",),
