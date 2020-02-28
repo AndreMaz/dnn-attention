@@ -63,9 +63,9 @@ class TestStringMethods(unittest.TestCase):
             date_format.dateTupleToMMSlashDDSlashYY(dateTuple), "08/30/21")
 
     def test_dateTupleToMSlashDSlashYY(self):
-        dateTuple = [2020, 8, 1]
+        dateTuple = [2021, 8, 1]
         self.assertEqual(
-            date_format.dateTupleToMSlashDSlashYY(dateTuple), "8/1/20")
+            date_format.dateTupleToMSlashDSlashYY(dateTuple), "8/1/21")
 
     def test_dateTupleToMMDDYY(self):
         dateTuple = [2020, 8, 1]

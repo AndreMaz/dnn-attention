@@ -77,7 +77,7 @@ def dateTupleToMMSlashDDSlashYY(dateTuple: list) -> str:
 
 def dateTupleToMSlashDSlashYY(dateTuple: list) -> str:
     # Date format such as 1/20/19
-    yearStr = f"{dateTuple[0]}"[:2]
+    yearStr = f"{dateTuple[0]}"[2:]
     return f"{dateTuple[1]}/{dateTuple[2]}/{yearStr}"
 
 def dateTupleToMMDDYY(dateTuple: list) -> str:
