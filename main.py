@@ -3,7 +3,8 @@ from dataset.date_format import INPUT_VOCAB, OUTPUT_VOCAB, INPUT_LENGTH, OUTPUT_
 from dataset import generator
 from models.inference import runSeq2SeqInference
 # from models.seq2seq.model import createModel
-from models.luong.model import createModel
+# from models.luong.model import createModel
+from models.bahdanau.model import createModel
 
 from datetime import datetime
 from tensorflow import keras
