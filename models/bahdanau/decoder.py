@@ -22,28 +22,25 @@ class Decoder(tf.keras.Model):
 
     # Reshape from batch-major into time-major
     # [time_steps, batch_size, features]
-    dec_input = tf.transpose(dec_input, [1,0,2])
-    # tf.reshape(x, [1,0,2])
-    perStepInputs = tf.unstack(dec_input, axis=0)
+    perStepInputs = tf.unstack(dec_input, axis=1)
     perStepOutputs = []
 
     prevDecoderHiddenState = dec_hidden[0]
     prevDecoderCarryState = dec_hidden[1]
 
     for _, currentInput in enumerate(perStepInputs):
-        # print(currentInput.shape)
-        
+        # Compute context vector        
         contextVector, attention_weights = self.attention(prevDecoderHiddenState, enc_outputs)
-
+        
+        # Concatenate with current input
         currentInput = tf.concat([currentInput, contextVector], axis=1)
-        # print(currentInput.shape)
 
-        ## Concatenate with current input
+        # Pass the data into LSTM cell 
         stepOutput, currentState = self.cell(currentInput, states=[prevDecoderHiddenState, prevDecoderCarryState])
         prevDecoderHiddenState = currentState[0]
         prevDecoderCarryState = currentState[1]
-        # print(stepOutput)
-        # print(prevDecoderHiddenState)
+        
+        # Append the data
         perStepOutputs.append(stepOutput)
 
     # Convert list to tensor

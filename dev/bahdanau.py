@@ -19,12 +19,10 @@ def runner():
 
     ### Encoder 
     encoder = Encoder(inputVocabSize, embeddingDims, lstmUnits)
-    # hidden = encoder.initialize_hidden_state()
     encoderHiddenStates, encoderLastHiddenState, encoderLastCarryState = encoder(encoderEmbeddingInput)
 
     ### Decoder
     decoderEmbeddingInput = encodeOutputDateStrings(["2020-08-01", "2020-08-01"])
-
     decoder = Decoder(outputVocabSize, embeddingDims, lstmUnits)
     decoderOutput = decoder(decoderEmbeddingInput, [encoderLastHiddenState, encoderLastCarryState], encoderHiddenStates)
     
