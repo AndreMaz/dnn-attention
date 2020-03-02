@@ -2,9 +2,7 @@
 from dataset.date_format import INPUT_VOCAB, OUTPUT_VOCAB, INPUT_LENGTH, OUTPUT_LENGTH, INPUT_FNS, dateTupleToYYYYDashMMDashDD
 from dataset import generator
 from models.inference import runSeq2SeqInference
-# from models.seq2seq.model import createModel
-# from models.luong.model import createModel
-from models.bahdanau.model import createModel
+from models.model_factory import model_factory
 
 from datetime import datetime
 from tensorflow import keras
@@ -13,6 +11,8 @@ minYear = '1950-01-01'
 maxYear = '2050-01-01'
 
 def main(minYear: str, maxYear: str) -> None:
+    createModel = model_factory("bahdanau")
+
     trainEncoderInput, trainDecoderInput, trainDecoderOutput, valEncoderInput, valDecoderInput, valDecoderOutput, testDateTuples = generator.generateDataSet(
         minYear, maxYear)
     # print(trainEncoderInput.shape)
