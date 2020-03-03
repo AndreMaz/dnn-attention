@@ -23,10 +23,13 @@ python date-conversion/main.py <model-name> # One of "seq2seq", "luong" or "bahd
 python date-conversion/tests/runner.py
 ```
 
+## Sorting Numbers
+
 ## Useful Links
 - Tensorflow.js [data-conversion-attention](https://github.com/tensorflow/tfjs-examples/tree/master/date-conversion-attention) example. I've simply ported the dataset generation script and Luong's attention to Python. All the credit goes to the TF team and the people that built the model.
 - [Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/pdf/1409.0473.pdf)
 - [Effective Approaches to Attention-based Neural Machine Translation](https://arxiv.org/abs/1508.04025)
+- [Pointer Networks](https://arxiv.org/abs/1506.03134)
 - [Neural machine translation with attention](https://www.tensorflow.org/tutorials/text/nmt_with_attention)
 - [Attention Mechanism](https://blog.floydhub.com/attention-mechanism/)
 - [Attn: Illustrated Attention](https://towardsdatascience.com/attn-illustrated-attention-5ec4ad276ee3)
