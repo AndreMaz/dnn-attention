@@ -1,5 +1,5 @@
 import sys
-sys.path.append('.')
+sys.path.append('./date-conversion')
 from dataset import generator
 import unittest
 

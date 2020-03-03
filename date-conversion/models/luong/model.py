@@ -2,6 +2,7 @@ from tensorflow.keras.layers import Input, Embedding, LSTM, TimeDistributed, Den
 from tensorflow.keras.models import Model
 from models.luong.last_time_step_layer import GetLastTimestepLayer
 
+
 def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength, embeddingDims, lstmUnits):
 
     # Encoder
@@ -23,7 +24,8 @@ def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength, embe
     )(encoderEmbeddingOutput)
 
     # Get last hidden state
-    encoderLastState = GetLastTimestepLayer(name="encoderLastStateExtractor")(encoderLSTMOutput)
+    encoderLastState = GetLastTimestepLayer(
+        name="encoderLastStateExtractor")(encoderLSTMOutput)
 
     # Decoder
     decoderEmbeddingInput = Input(

@@ -1,5 +1,5 @@
 import sys
-sys.path.append('.')
+sys.path.append('./date-conversion')
 
 import unittest
 from dataset import date_format
