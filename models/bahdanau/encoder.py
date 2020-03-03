@@ -13,11 +13,9 @@ class Encoder(Model):
                        return_state=True)
 
     def call(self, x):
+        # Get the embeddings for the input
         x = self.embedding(x)
 
-        # out, hidden_state, carry_state = self.lstm(x, initial_state = [hidden, hidden])
+        # Run in trough the LSTM
         out, hidden_state, carry_state = self.lstm(x)
         return out, hidden_state, carry_state
-
-    # def initialize_hidden_state(self):
-    #     return zeros((self.batch_sz, self.enc_units))
