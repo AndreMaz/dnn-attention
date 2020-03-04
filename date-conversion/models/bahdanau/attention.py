@@ -12,13 +12,13 @@ class BahdanauAttention(Layer):
     # decoder_prev_hidden shape is [batch_size, features]
     # enc_output shape is [batch_size, timesteps, features]
     # To performs ops between them we need to reshape the decoder_prev_hidden into [batch_size, 1, features]
-    query_with_time_axis = tf.expand_dims(decoder_prev_hidden, 1)
+    decoder_prev_hidden_with_time_dim = tf.expand_dims(decoder_prev_hidden, 1)
 
     # score shape == (batch_size, max_length, 1)
     # we get 1 at the last axis because we are applying score to self.V
     # the shape of the tensor before applying self.V is (batch_size, max_length, units)
     score = self.V(tf.nn.tanh(
-        self.W1(query_with_time_axis) + self.W2(enc_outputs)))
+        self.W1(decoder_prev_hidden_with_time_dim) + self.W2(enc_outputs)))
 
     # Apply softmax
     attention_weights = tf.nn.softmax(score, axis=1)
