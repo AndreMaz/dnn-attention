@@ -17,18 +17,25 @@ class ArtificialDataset(tf.data.Dataset):
             for _ in range(size):
                 enc_input_list.append(random.randint(lowerLimit, upperLimit))
             
+            # Decoder's input is equal to the sorted encoder's input
             dec_input_list = list(enc_input_list)
             dec_input_list.sort()
+
+            # Decoder should produce sorted list
+            dec_output_list = list(dec_input_list)
+
+            # Remove last element from decoder's input
+            
             # Add Start Code
-            dec_input_list[0] = START_CODE
-    
+            dec_input_list = [START_CODE] + dec_input_list[1:]
+
             input = tf.convert_to_tensor(enc_input_list, dtype="float32")
             # input = tf.random.uniform((1, size), minval = lowerLimit, maxval = upperLimit, dtype="int32")
             entry['enc_in'] = input
             
             entry['dec_in'] = tf.convert_to_tensor(dec_input_list, dtype="float32")
 
-            entry['dec_out'] = tf.one_hot(tf.convert_to_tensor(enc_input_list, dtype="int32"), upperLimit + 1) # +1 for START CODE
+            entry['dec_out'] = tf.one_hot(tf.convert_to_tensor(dec_output_list, dtype="int32"), upperLimit + 1) # +1 for START CODE
 
             yield (entry)
     
