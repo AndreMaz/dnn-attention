@@ -5,18 +5,22 @@ from models.model_factory import model_factory
 embeddingDims = 64
 lstmUnits = 64
 
-inputLength = 10
-vocabularySize = 100
-numSamples = 50
+num_samples = 1
+sample_length = 10
+max_value = 10
+vocab_size = max_value + 1 # +1 For start of Sequence
 
 def main() -> None:
     print('Generating Dataset')
-    trainEncoderInput, trainDecoderInput, trainDecoderOutput = generateEncoderInput(numSamples, inputLength, vocabularySize)
+    trainEncoderInput, trainDecoderInput, trainDecoderOutput = generateEncoderInput(num_samples, sample_length, max_value, vocab_size)
+    print(trainEncoderInput)
+    print(trainDecoderInput)
+    print(trainDecoderOutput)
     print('Dataset Generated!')
 
     modelName = "pointer"
 
-    model = model_factory(modelName, vocabularySize+1, vocabularySize+1, inputLength, inputLength, embeddingDims, lstmUnits)
+    model = model_factory(modelName, vocab_size, sample_length, embeddingDims, lstmUnits)
     model.summary()
     # dataset = ArtificialDataset(10)
     

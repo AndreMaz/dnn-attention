@@ -8,11 +8,12 @@ class Decoder(tf.keras.Model):
 
         self.embedding_dim = embedding_dim
         self.dec_units = dec_units
+        self.vocab_size = vocab_size
 
         self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_dim)
 
         # Attention Layers
-        self.attention = PointerAttention(self.dec_units)
+        self.attention = PointerAttention(self.dec_units, self.vocab_size)
 
         # We are going to do the looping manually so instead of LSMT Layer we use LSTM cell
         self.cell = tf.keras.layers.LSTMCell(

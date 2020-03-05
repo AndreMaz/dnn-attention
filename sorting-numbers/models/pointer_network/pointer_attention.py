@@ -3,8 +3,10 @@ import tensorflow as tf
 import numpy as np
 
 class PointerAttention(Layer):
-  def __init__(self, units):
+  def __init__(self, units, vocab_size):
     super(PointerAttention, self).__init__()
+    self.vocab_size = vocab_size
+
     self.W1 = Dense(units)
     self.W2 = Dense(units)
     self.V = Dense(1)
@@ -34,7 +36,7 @@ class PointerAttention(Layer):
       pointer = tf.argmax(attention_weights, axis = 1)
 
       # Encoder in into one-hot
-      pointer = tf.one_hot(pointer, 10)
+      pointer = tf.one_hot(pointer, self.vocab_size)
       pointerList.append(pointer)
     
     # pointer[index] = 1

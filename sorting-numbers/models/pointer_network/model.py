@@ -3,19 +3,19 @@ from tensorflow.keras.models import Model
 from models.pointer_network.encoder import Encoder
 from models.pointer_network.decoder import Decoder
 
-def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength, embeddingDims, lstmUnits):
+def createModel(vocab_size, seq_length, embedding_dims, lstm_units):
     # Encoder
-    encoderEmbeddingInput = Input(shape=(inputLength,), name='embeddingEncoderInput')
+    encoderEmbeddingInput = Input(shape=(seq_length,), name='embeddingEncoderInput')
     
-    encoder = Encoder(inputVocabSize, embeddingDims, lstmUnits)
+    encoder = Encoder(vocab_size, embedding_dims, lstm_units)
     encoderHiddenStates, encoderLastHiddenState, encoderLastCarryState = encoder(
         encoderEmbeddingInput)
 
     # Decoder
-    decoderEmbeddingInput = Input(shape=(outputLength,), name='embeddingDecoderInput')
+    decoderEmbeddingInput = Input(shape=(seq_length,), name='embeddingDecoderInput')
 
-    decoder = Decoder(outputVocabSize, embeddingDims, lstmUnits)
-    
+    decoder = Decoder(vocab_size, embedding_dims, lstm_units)
+
     decoderOutput = decoder(decoderEmbeddingInput, [
                             encoderLastHiddenState, encoderLastCarryState], encoderHiddenStates)
 
