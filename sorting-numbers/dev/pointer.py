@@ -3,30 +3,33 @@ sys.path.append('./sorting-numbers')
 import tensorflow as tf
 from models.pointer_network.encoder import Encoder
 from models.pointer_network.decoder import Decoder
+from dataset.generator import generateDataset
 
-inputVocabSize = 10 + 1 # 10 for number + 1 for START CODE
 embeddingDims = 64
 lstmUnits = 64
 
+num_samples = 1
+sample_length = 10
+max_value = 10
+
+input_length = sample_length + 1 # For special chars
+vocab_size = max_value + 2 # +2 for SOS and EOS
+
+
 def runner():
-    # Encoder Input
-    encoderEmbeddingInput = tf.convert_to_tensor([[0, 8, 9, 7, 5, 4, 6, 2, 3, 1], [0, 8, 9, 7, 5, 4, 6, 2, 3, 1]], dtype="float32")
-    
-    decoder_input = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    STOP_SYMBOL = 10 
-    # Shifted Decoder Input
-    decoderEmbeddingInput = tf.convert_to_tensor( [[STOP_SYMBOL, 1, 2, 3, 4, 5, 6, 7, 8, 9], [STOP_SYMBOL, 1, 2, 3, 4, 5, 6, 7, 8, 9]], dtype="float32")
+    encoderEmbeddingInput, decoderEmbeddingInput, trainDecoderOutput = generateDataset(num_samples, sample_length, max_value, vocab_size)
 
-    decoder_output = tf.one_hot(decoder_input, len(decoder_input) + 1)
-    print(decoder_output)
+    print(encoderEmbeddingInput)
+    print(decoderEmbeddingInput)
+    print(trainDecoderOutput)
 
-    encoder = Encoder(inputVocabSize, embeddingDims, lstmUnits)
+    encoder = Encoder(vocab_size, embeddingDims, lstmUnits)
     encoderHiddenStates, encoderLastHiddenState, encoderLastCarryState = encoder(encoderEmbeddingInput)
 
-    decoder = Decoder(inputVocabSize, embeddingDims, lstmUnits)
-    res = decoder(decoderEmbeddingInput, [encoderLastHiddenState, encoderLastCarryState], encoderHiddenStates)
+    decoder = Decoder(vocab_size, embeddingDims, lstmUnits)
+    decoderOutput = decoder(decoderEmbeddingInput, [encoderLastHiddenState, encoderLastCarryState], encoderHiddenStates)
 
-    print(res)
+    print(decoderOutput)
     return 1
 
 

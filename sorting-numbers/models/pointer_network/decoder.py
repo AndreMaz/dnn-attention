@@ -16,48 +16,28 @@ class Decoder(tf.keras.Model):
         self.attention = PointerAttention(self.dec_units, self.vocab_size)
 
         # We are going to do the looping manually so instead of LSMT Layer we use LSTM cell
-        self.cell = tf.keras.layers.LSTMCell(
-            self.dec_units, recurrent_initializer='glorot_uniform')
+        # self.cell = tf.keras.layers.LSTMCell(
+        #     self.dec_units, recurrent_initializer='glorot_uniform')
 
         self.lstm = tf.keras.layers.LSTM(self.dec_units,
-                       return_sequences=True,
-                       return_state=True)
-
+                       return_sequences=True)
+        
+        self.V = tf.keras.layers.Dense(11)
 
     def call(self, dec_input, dec_hidden, enc_outputs):
 
         # Convert input to embeddings
         dec_input = self.embedding(dec_input)
 
-        decoder_outputs, hidden, carry = self.lstm(dec_input, initial_state = dec_hidden )
+        decoder_outputs = self.lstm(dec_input, initial_state = dec_hidden )
+
+        # attention = tf.keras.layers.Dot((2, 2), name="attentionDot")(
+        #     [decoder_outputs, enc_outputs])
+
+        # a = self.V(attention)
+        # return a
 
         pointers = self.attention(decoder_outputs, enc_outputs)
-
-        # perStepInputs = tf.unstack(dec_input, axis=1)
-        # perStepOutputs = []
-
-        # prevDecoderHiddenState = dec_hidden[0]
-        # prevDecoderCarryState = dec_hidden[1]
-
-        # pointerList = []
-        # # Iterate over time steps and compute the attention
-        # for _, currentInput in enumerate(perStepInputs):
-        #     # Pass the data into LSTM cell
-        #     stepOutput, currentState = self.cell(
-        #         currentInput, states=[prevDecoderHiddenState, prevDecoderCarryState])
-
-        #     # Update prev states. They will be used in the next iteration
-        #     prevDecoderHiddenState = currentState[0]
-        #     prevDecoderCarryState = currentState[1]
-
-        #     pointer = self.attention(stepOutput, enc_outputs)
-        #     pointerList.append(pointerList)
-
-
-        # decoderHiddenStates, decoderLastHiddenState, decoderLastCarryState = self.lstm(dec_input, initial_state = dec_hidden)
-
-        # pointers = self.attention(decoderHiddenStates, enc_outputs)
-
-        # pointers = tf.convert_to_tensor(pointers)
-
         return pointers
+
+        # return 1

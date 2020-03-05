@@ -31,12 +31,13 @@ class PointerAttention(Layer):
       score = tf.squeeze(score, axis=2)
 
       # Apply softmax
-      attention_weights = tf.nn.softmax(score, axis=1)
+      pointer = tf.nn.softmax(score, axis=1)
+      
       # Find the pointer
-      pointer = tf.argmax(attention_weights, axis = 1)
+      # pointer = tf.maximum(attention_weights, axis = 1)
 
       # Encoder in into one-hot
-      pointer = tf.one_hot(pointer, self.vocab_size)
+      # pointer = tf.one_hot(pointer, self.vocab_size)
       pointerList.append(pointer)
     
     # pointer[index] = 1
