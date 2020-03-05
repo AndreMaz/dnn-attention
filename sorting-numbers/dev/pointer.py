@@ -12,9 +12,8 @@ num_samples = 1
 sample_length = 10
 max_value = 10
 
-input_length = sample_length + 1 # For special chars
 vocab_size = max_value + 2 # +2 for SOS and EOS
-
+input_length = sample_length + 1 # For special chars at the beggining
 
 def runner():
     encoderEmbeddingInput, decoderEmbeddingInput, trainDecoderOutput = generateDataset(num_samples, sample_length, max_value, vocab_size)

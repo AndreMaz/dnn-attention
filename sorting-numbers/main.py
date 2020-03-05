@@ -5,18 +5,19 @@ from models.model_factory import model_factory
 embedding_dims = 64
 lstm_units = 64
 
-num_samples = 50_000
+num_samples_training = 50_000
+num_sample_validation = 50_000
 sample_length = 10
 max_value = 100 # Upper bound in range.random()
 
-input_length = sample_length + 1 # For special chars
 vocab_size = max_value + 2 # +2 for SOS and EOS
+input_length = sample_length + 1 # For special chars at the beggining of input
 
 def main() -> None:
     print('Generating Dataset')
-    trainEncoderInput, trainDecoderInput, trainDecoderOutput = generateDataset(num_samples, sample_length, max_value, vocab_size)
+    trainEncoderInput, trainDecoderInput, trainDecoderOutput = generateDataset(num_samples_training, sample_length, max_value, vocab_size)
 
-    valEncoderInput, valDecoderInput, valDecoderOutput = generateDataset(num_samples, sample_length, max_value, vocab_size)
+    valEncoderInput, valDecoderInput, valDecoderOutput = generateDataset(num_sample_validation, sample_length, max_value, vocab_size)
     print(trainEncoderInput)
     print(trainDecoderInput)
     print(trainDecoderOutput)
