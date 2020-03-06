@@ -14,27 +14,13 @@ def runSeq2SeqInference(model, encoderInput, vocab_size, input_length, max_value
     for i in range(1, input_length):
         # Make a predition
         predictOut = model.predict([encoderInput, decoderInput])
-        # Get the result
-        output = predictOut.argmax(2)[0, i-1]
-        # Append it to the decoder's input
-        decoderInput[0, i] = output
+        # Get the pointer
+        pointer = predictOut.argmax(2)[0, i-1]
+        # Get the value that pointer points to
+        valuePointed = encoderInput[0, pointer]
+        decoderInput[0, i] = valuePointed
 
-    finalPrediction = model.predict([encoderInput, decoderInput])
-    lastPointer = finalPrediction.argmax(2)[0, input_length-1]
-
-    encoderInput = encoderInput.numpy().astype("int16")[0]
-    decoderInput = decoderInput.astype("int16")
-
-    output = []
-    for i in range(1, decoderInput.shape[1]):
-        pointer = decoderInput[0, i]
-        output.append(encoderInput[pointer])
-
-    output.append(encoderInput[lastPointer])
-
-    # print(output)
-
-    return output[:-1]
+    return list(decoderInput[0].astype("int16"))[1:]
 
 
 if __name__ == "__main__":

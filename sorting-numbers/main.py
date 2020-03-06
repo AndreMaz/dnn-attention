@@ -8,8 +8,8 @@ import numpy as np
 embedding_dims = 64
 lstm_units = 64
 
-num_samples_training = 50_000
-num_sample_validation = 10_000
+num_samples_training = 150_000
+num_sample_validation = 50_000
 
 sample_length = 10
 max_value = 100 # Upper bound in range.random()
@@ -35,7 +35,7 @@ def main() -> None:
     model.fit(
         x=[trainEncoderInput, trainDecoderInput],
         y=trainDecoderOutput,
-        epochs=4,
+        epochs=15,
         batch_size=128,
         shuffle=True,
         validation_data=([valEncoderInput, valDecoderInput], valDecoderOutput),
@@ -43,9 +43,12 @@ def main() -> None:
     )
 
     # # Test the model
-    num_samples_tests = 20
+    num_samples_tests = 200
+    correctPredictions = 0
+    wrongPredictions = 0
     trainEncoderInput, _, _ = generateDataset(num_samples_tests, sample_length, max_value, vocab_size)
     for _, inputEntry in enumerate(trainEncoderInput):
+        print('__________________________________________________')
 
         print(list(inputEntry.numpy().astype("int16")[1:]))
 
@@ -62,15 +65,20 @@ def main() -> None:
 
         predictedAnswer = runSeq2SeqInference(model, inputEntry, vocab_size, input_length, max_value)
         print(predictedAnswer)
-        intersect = list(set(correctAnswer).intersection(set(predictedAnswer)))
-        if (len(intersect) == 0):
-            print('OK')
-        else:
-            print('WRONG!')
 
-
-        print('__________________________________')
+        diff = []
+        for index, value in enumerate(correctAnswer):
+            diff.append(correctAnswer[index] - predictedAnswer[index])
+        
     
+        if (all(result== 0 for (result) in diff)):
+            correctPredictions += 1
+            print('______________________OK__________________________')
+        else:
+            wrongPredictions += 1
+            print('_____________________WRONG!_______________________')
+    
+    print(f"Correct Predictions: {correctPredictions/num_samples_tests} || Wrong Predictions: {wrongPredictions/num_samples_tests}")
 
 if __name__ == "__main__":
     main()
