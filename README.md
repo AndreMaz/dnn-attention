@@ -1,13 +1,11 @@
 # Sequence 2 Sequence with Attention Mechanisms
 This repo contains implementation of:
-- Classical Sequence 2 Sequence model without attention
-- Luong's Dot Attention
-- Bahdanau's Attention
-- Pointer Networks a.k.a. Ptr-Net
+- Classical Sequence 2 Sequence model without attention. [Date Conversion Problem](#date-conversion-problem)
+- Luong's Dot Attention. [Date Conversion Problem](#date-conversion-problem)
+- Bahdanau's Attention. [Date Conversion Problem](#date-conversion-problem)
+- Pointer Networks a.k.a. Ptr-Net. [Sorting Numbers](#sorting-numbers)
 
-I've tried to (re)use Keras layers as much as possible and avoid building everything from scratch to ease the readability of the code.
-
-> Note: I'm a Python newbie so the code might not follow the standards and the usual conventions.
+I've tried, as much as possible, to avoid building custom layers in order to ease the readability of the code. Also, note that the code in `/model` folders contains repeated elements (e.g., `Encoder` is the same for all the models). Again, this is done to ease the readability and portability of the code. Each model is contained in a single folder, so you can simply copy it and it should work for you and your own problem.
 
 ## Date Conversion Problem
 Convert dates in different formats (e.g., `"08/30/21"`, `"080120"`, `"AUG 01, 2020"`) into ISO standard (e.g., `"2021-08-30"`, `"2020-08-01"`) format.
@@ -29,7 +27,7 @@ python date-conversion/tests/runner.py
 ```
 
 ## Sorting Numbers
-Sorts numbers in an ascending order.
+Sorts numbers in an ascending order with Pointer Networks.
 
 ### Problem Stats
 - Input vocabulary size: 100
