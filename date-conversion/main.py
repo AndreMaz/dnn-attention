@@ -31,7 +31,7 @@ def main(minYear: str, maxYear: str) -> None:
         OUTPUT_VOCAB), INPUT_LENGTH, OUTPUT_LENGTH, embeddingDims, lstmUnits)
     
     # Show model stats
-    model.summary()
+    model.summary(line_length=200)
 
     # Tensorboard callbacks
     logdir = "logs/scalars/" + datetime.now().strftime("%Y%m%d-%H%M%S")

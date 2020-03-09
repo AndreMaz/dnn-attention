@@ -41,7 +41,7 @@ def main() -> None:
 
     # Create model
     model = model_factory(modelName, vocab_size, input_length, embedding_dims, lstm_units)
-    model.summary()
+    model.summary(line_length=200)
     
     model.fit(
         x=[trainEncoderInput, trainDecoderInput],
