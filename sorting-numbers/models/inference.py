@@ -20,6 +20,14 @@ def runSeq2SeqInference(model, encoderInput, vocab_size, input_length, max_value
         valuePointed = encoderInput[0, pointer]
         decoderInput[0, i] = valuePointed
 
+    # Final pointer given the full decoder's sequence as input
+    # If model is trained well should point to EOS symbol
+    finalPrediction = model.predict([encoderInput, decoderInput])
+    finalPointer = finalPrediction.argmax(2)[0, i-1]
+    finalValue = encoderInput[0, finalPointer]
+
+    # Return only the number sequence
+    # 1st element is SOS
     return list(decoderInput[0].astype("int16"))[1:]
 
 

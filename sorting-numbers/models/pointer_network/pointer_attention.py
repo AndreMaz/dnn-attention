@@ -12,9 +12,15 @@ class PointerAttention(Layer):
     self.V = Dense(1)
 
   def call(self, dec_outputs, enc_outputs):
+    
+    # Unstack the input along time axis, i.e, axis = 1
+    # Original data is a Tensor of  [ batch_size, time_steps, features] shape
+    # After unstacking it is going to be a list (length = time_steps) of Tensors
+    # Each element in list is going to be a Tensor of [ batch_size, features] shape
     steps = tf.unstack(dec_outputs, axis=1)
     pointerList = []
 
+    # Iterate over time steps and compute the pointers
     for _, currentStep in enumerate(steps):
       # decoder_prev_hidden shape is [batch_size, features]
       # enc_output shape is [batch_size, timesteps, features]
@@ -33,18 +39,12 @@ class PointerAttention(Layer):
       # Apply softmax
       pointer = tf.nn.softmax(score, axis=1)
       
-      # Find the pointer
-      # pointer = tf.maximum(attention_weights, axis = 1)
-
-      # Encoder in into one-hot
-      # pointer = tf.one_hot(pointer, self.vocab_size)
+      # Store the pointer
       pointerList.append(pointer)
     
-    # pointer[index] = 1
-
+    # Convert list back to tensor
+    # Will create a time-major Tensor [time_steps, batch_size, features]
     pointerList = tf.convert_to_tensor(pointerList)
-    # context_vector = attention_weights * enc_outputs
-    # Sum along 1 axis to get [batch_size, hidden_size] shape
-    # context_vector = tf.reduce_sum(context_vector, axis=1)
 
+    # Put the data back into batch-major shape [batch_size, time_steps, features]
     return tf.transpose(pointerList, [1, 0, 2])

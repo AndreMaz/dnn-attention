@@ -23,9 +23,6 @@ class Decoder(tf.keras.Model):
         # Convert input to embeddings
         dec_input = self.embedding(dec_input)
 
-        # Reshape from batch-major into time-major
-        # [time_steps, batch_size, features]
-
         # Unstack the input along time axis, i.e, axis = 1
         # Original data is a Tensor of  [ batch_size, time_steps, features] shape
         # After unstacking it is going to be a list (length = time_steps) of Tensors

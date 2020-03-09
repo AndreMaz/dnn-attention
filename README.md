@@ -3,9 +3,14 @@ This repo contains implementation of:
 - Classical Sequence 2 Sequence model without attention
 - Luong's Dot Attention
 - Bahdanau's Attention
+- Pointer Networks a.k.a. Ptr-Net
+
+I've tried to (re)use Keras layers as much as possible and avoid building everything from scratch to ease the readability of the code.
+
+> Note: I'm a Python newbie so the code might not follow the standards and the usual conventions.
 
 ## Date Conversion Problem
-Convert dates in different formats (e.g., `08/30/21`, `080120`, `AUG 01, 2020`) into ISO standard (e.g., `2021-08-30`, `2020-08-01`) format.
+Convert dates in different formats (e.g., `"08/30/21"`, `"080120"`, `"AUG 01, 2020"`) into ISO standard (e.g., `"2021-08-30"`, `"2020-08-01"`) format.
 
 ### Problem Stats
 - Input vocabulary size: 35
@@ -24,8 +29,23 @@ python date-conversion/tests/runner.py
 ```
 
 ## Sorting Numbers
+Sorts numbers in an ascending order.
+
+### Problem Stats
+- Input vocabulary size: 100
+- Input length: 10
+- Output vocabulary size: 100
+- Output length: 10
+
+> Note: Pointer Networks are capable of dealing with inputs of variable length. However, after using `model.compile()` the model is no longer capable of accepting input sequences of different length. I think the only way of achieving this is by not using `model.compile()` and computing the loss and grads manually. This is a `ToDo`...
+
+### Running 
+```bash
+python sorting-numbers/main.py <model-name> # One of "pointer". If not provided "pointer" will be used
+```
 
 ## Useful Links
+A short list of link that I've found useful while I was learning about attention mechanisms:
 - Tensorflow.js [data-conversion-attention](https://github.com/tensorflow/tfjs-examples/tree/master/date-conversion-attention) example. I've simply ported the dataset generation script and Luong's attention to Python. All the credit goes to the TF team and the people that built the model.
 - [Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/pdf/1409.0473.pdf)
 - [Effective Approaches to Attention-based Neural Machine Translation](https://arxiv.org/abs/1508.04025)
@@ -41,5 +61,5 @@ Follow Tensorflow's [installation guide](https://www.tensorflow.org/install/pip)
 > I'm using Python v3.6 and Tensorflow v2.1
 
 ## Pytorch Implementation
-Please check [fmstam](https://github.com/fmstam)'s [repo](https://github.com/fmstam/seq2seq_with_deep_attention)
+For Pytorch implementation check [fmstam](https://github.com/fmstam)'s [repo](https://github.com/fmstam/seq2seq_with_deep_attention).
 

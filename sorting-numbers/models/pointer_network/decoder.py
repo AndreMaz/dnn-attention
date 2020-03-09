@@ -12,32 +12,20 @@ class Decoder(tf.keras.Model):
 
         self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_dim)
 
-        # Attention Layers
-        self.attention = PointerAttention(self.dec_units, self.vocab_size)
-
-        # We are going to do the looping manually so instead of LSMT Layer we use LSTM cell
-        # self.cell = tf.keras.layers.LSTMCell(
-        #     self.dec_units, recurrent_initializer='glorot_uniform')
-
         self.lstm = tf.keras.layers.LSTM(self.dec_units,
                        return_sequences=True)
-        
-        self.V = tf.keras.layers.Dense(11)
 
+        # Attention Layers
+        self.attention = PointerAttention(self.dec_units, self.vocab_size)
+        
     def call(self, dec_input, dec_hidden, enc_outputs):
 
         # Convert input to embeddings
         dec_input = self.embedding(dec_input)
 
+        # Pass through LSTM
         decoder_outputs = self.lstm(dec_input, initial_state = dec_hidden )
 
-        # attention = tf.keras.layers.Dot((2, 2), name="attentionDot")(
-        #     [decoder_outputs, enc_outputs])
-
-        # a = self.V(attention)
-        # return a
-
+        # Compute the pointers
         pointers = self.attention(decoder_outputs, enc_outputs)
         return pointers
-
-        # return 1

@@ -28,7 +28,6 @@ def runner():
     decoder = Decoder(vocab_size, embeddingDims, lstmUnits)
     decoderOutput = decoder(decoderEmbeddingInput, [encoderLastHiddenState, encoderLastCarryState], encoderHiddenStates)
 
-    print(decoderOutput)
     return 1
 
 

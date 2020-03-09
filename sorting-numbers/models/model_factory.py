@@ -9,7 +9,7 @@ def model_factory(name, vocab_size, seq_length, embedding_dims, lstm_units):
         createModel = models[name]
         print(f'Using "{name.upper()}" model')
     except:
-        raise NameError('Unknown Model Name! Select one of: "seq2seq", "luong" or "bahdanau"')
+        raise NameError('Unknown Model Name! Select one of: "pointer"')
     
     return createModel(vocab_size, seq_length, embedding_dims, lstm_units)
 
