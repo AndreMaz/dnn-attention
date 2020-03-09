@@ -1,5 +1,5 @@
 import sys
-sys.path.append('.')
+sys.path.append('./date-conversion')
 from models.bahdanau.encoder import Encoder
 from models.bahdanau.decoder import Decoder
 from dataset.generator import encodeInputDateStrings, encodeOutputDateStrings

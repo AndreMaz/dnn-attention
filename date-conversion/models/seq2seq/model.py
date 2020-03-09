@@ -1,15 +1,8 @@
 from tensorflow.keras.layers import Input, Embedding, LSTM, TimeDistributed, Dense
 from tensorflow.keras.models import Model
 
-def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength):
-    embeddingDims = 64
-    lstmUnits = 64
-
-    print(f"inputVocabSize {inputVocabSize}")
-    print(f"outputVocabSize {outputVocabSize}")
-    print(f"inputLength {inputLength}")
-    print(f"outputLength {outputLength}")
-
+def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength, embeddingDims, lstmUnits):
+    # Encoder
     encoderEmbeddingInput = Input(shape=(inputLength,), name='embeddingEncoderInput')
 
     encoderEmbeddingOutput = Embedding(
@@ -26,6 +19,7 @@ def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength):
         name="encoderLSTM"
     )(encoderEmbeddingOutput)
 
+    # Decoder
     decoderEmbeddingInput = Input(shape=(outputLength,), name='embeddingDecoderInput')
 
     decoderEmbeddingOutput = Embedding(
@@ -42,6 +36,7 @@ def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength):
         name="decoderLSMT"
     )(decoderEmbeddingOutput, initial_state=[encoderLSTMOutput, encoderLSTMOutput])
 
+    # Prediction Layer
     outputGenerator = TimeDistributed(
         Dense(outputVocabSize, activation = "softmax"),
         name = "timeDistributedSoftmax"

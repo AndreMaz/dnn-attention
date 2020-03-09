@@ -4,31 +4,28 @@ from tensorflow.keras.models import Model
 from models.bahdanau.encoder import Encoder
 from models.bahdanau.decoder import Decoder
 
-def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength):
-    embeddingDims = 64
-    lstmUnits = 64
 
-    print(f"inputVocabSize {inputVocabSize}")
-    print(f"outputVocabSize {outputVocabSize}")
-    print(f"inputLength {inputLength}")
-    print(f"outputLength {outputLength}")
+def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength, embeddingDims, lstmUnits):
 
     # Encoder
     encoderEmbeddingInput = Input(
         shape=(inputLength,), name='embeddingEncoderInput')
 
-        # Decoder
+    # Encoder
+    encoder = Encoder(inputVocabSize, embeddingDims, lstmUnits)
+
+    encoderHiddenStates, encoderLastHiddenState, encoderLastCarryState = encoder(
+        encoderEmbeddingInput)
+
+    # Decoder
     decoderEmbeddingInput = Input(
         shape=(outputLength,), name='embeddingDecoderInput')
 
-    ### Encoder 
-    encoder = Encoder(inputVocabSize, embeddingDims, lstmUnits)
-    # hidden = encoder.initialize_hidden_state()
-    encoderHiddenStates, encoderLastHiddenState, encoderLastCarryState = encoder(encoderEmbeddingInput)
-
     decoder = Decoder(outputVocabSize, embeddingDims, lstmUnits)
-    decoderOutput = decoder(decoderEmbeddingInput, [encoderLastHiddenState, encoderLastCarryState], encoderHiddenStates)
-    
+    decoderOutput = decoder(decoderEmbeddingInput, [
+                            encoderLastHiddenState, encoderLastCarryState], encoderHiddenStates)
+
+    # Prediction Layers
     outputGeneratorTanh = TimeDistributed(
         Dense(lstmUnits, activation="tanh"),
         name="timeDistributedTanh"

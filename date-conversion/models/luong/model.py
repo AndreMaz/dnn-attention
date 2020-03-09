@@ -1,16 +1,9 @@
 from tensorflow.keras.layers import Input, Embedding, LSTM, TimeDistributed, Dense, Dot, Activation, Concatenate
 from tensorflow.keras.models import Model
 from models.luong.last_time_step_layer import GetLastTimestepLayer
-from models.luong.test import Decoder
 
-def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength):
-    embeddingDims = 64
-    lstmUnits = 64
 
-    print(f"inputVocabSize {inputVocabSize}")
-    print(f"outputVocabSize {outputVocabSize}")
-    print(f"inputLength {inputLength}")
-    print(f"outputLength {outputLength}")
+def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength, embeddingDims, lstmUnits):
 
     # Encoder
     encoderEmbeddingInput = Input(
@@ -31,7 +24,8 @@ def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength):
     )(encoderEmbeddingOutput)
 
     # Get last hidden state
-    encoderLastState = GetLastTimestepLayer(name="encoderLastStateExtractor")(encoderLSTMOutput)
+    encoderLastState = GetLastTimestepLayer(
+        name="encoderLastStateExtractor")(encoderLSTMOutput)
 
     # Decoder
     decoderEmbeddingInput = Input(
@@ -61,6 +55,7 @@ def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength):
     decoderCombinedContext = Concatenate(
         name="combinedContext")([context, decoderLSTMOutput])
 
+    # Prediction Layers
     outputGeneratorTanh = TimeDistributed(
         Dense(lstmUnits, activation="tanh"),
         name="timeDistributedTanh"
