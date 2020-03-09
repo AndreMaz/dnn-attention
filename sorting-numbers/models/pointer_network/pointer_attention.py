@@ -1,4 +1,4 @@
-from tensorflow.keras.layers import Layer, Dense, TimeDistributed
+from tensorflow.keras.layers import Layer, Dense, Softmax
 import tensorflow as tf
 import numpy as np
 
@@ -10,6 +10,8 @@ class PointerAttention(Layer):
     self.W1 = Dense(units)
     self.W2 = Dense(units)
     self.V = Dense(1)
+
+    self.attention = Softmax(axis=1, name="attention")
 
   def call(self, dec_outputs, enc_outputs):
     
@@ -37,7 +39,8 @@ class PointerAttention(Layer):
       score = tf.squeeze(score, axis=2)
 
       # Apply softmax
-      pointer = tf.nn.softmax(score, axis=1)
+      # pointer = tf.nn.softmax(score, axis=1)
+      pointer = self.attention(score)
       
       # Store the pointer
       pointerList.append(pointer)

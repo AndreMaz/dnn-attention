@@ -21,7 +21,7 @@ def runSeq2SeqInference(model, encoderInput, vocab_size, input_length, max_value
         decoderInput[0, i] = valuePointed
 
     # Final pointer given the full decoder's sequence as input
-    # If model is trained well should point to EOS symbol
+    # If model is trained well it should point to EOS symbol
     finalPrediction = model.predict([encoderInput, decoderInput])
     finalPointer = finalPrediction.argmax(2)[0, i-1]
     finalValue = encoderInput[0, finalPointer]

@@ -1,4 +1,4 @@
-from tensorflow.keras.layers import Layer, Dense
+from tensorflow.keras.layers import Layer, Dense, Softmax
 import tensorflow as tf
 
 class BahdanauAttention(Layer):
@@ -7,6 +7,8 @@ class BahdanauAttention(Layer):
     self.W1 = Dense(units)
     self.W2 = Dense(units)
     self.V = Dense(1)
+
+    self.attention = Softmax(axis=1, name="attention")
 
   def call(self, decoder_prev_hidden, enc_outputs):
     # decoder_prev_hidden shape is [batch_size, features]
@@ -21,7 +23,8 @@ class BahdanauAttention(Layer):
         self.W1(decoder_prev_hidden_with_time_dim) + self.W2(enc_outputs)))
 
     # Apply softmax
-    attention_weights = tf.nn.softmax(score, axis=1)
+    # attention_weights = tf.nn.softmax(score, axis=1)
+    attention_weights = self.attention(score)
 
     context_vector = attention_weights * enc_outputs
     # Sum along 1 axis to get [batch_size, hidden_size] shape
