@@ -1,6 +1,6 @@
 import sys
 sys.path.append('./sorting-numbers')
-from dataset.generator import ArtificialDataset
+from dataset.generator import generateDataset
 import unittest
 import numpy as np
 import tensorflow as tf
@@ -14,54 +14,46 @@ class TestArtificialDataset(unittest.TestCase):
     #    self.assertFalse('Foo'.isupper())
 
     def test_generate(self):
-        dataset = ArtificialDataset(4)
+        num_samples = 2 # number of samples to generate
+        sample_length = 10 # Length of input sequence
+        max_value = 100 # Upper bound (range.random()) to generate a number
+        vocab_size = max_value + 2 # +2 for SOS and EOS
 
-        count = 0
-        for _ in dataset:
-             count += 1
-        
-        self.assertEqual(count, 4)
+        trainEncoderInput, trainDecoderInput, trainDecoderOutput = generateDataset(num_samples, sample_length, max_value, vocab_size)
+
+        self.assertEqual(len(trainEncoderInput), 2)
+        self.assertEqual(len(trainDecoderInput), 2)
+        self.assertEqual(len(trainDecoderOutput), 2)
         
     def test_tensorShapes(self):
-        dataset = ArtificialDataset(4, 11)
+        num_samples = 2 # number of samples to generate
+        sample_length = 10 # Length of input sequence
+        max_value = 100 # Upper bound (range.random()) to generate a number
+        vocab_size = max_value + 2 # +2 for SOS and EOS
 
-        enc_in = []
-        dec_in = []
-        for d in dataset:
-             enc_in.append(d['enc_in'])
-             dec_in.append(d['dec_in'])
+        trainEncoderInput, trainDecoderInput, trainDecoderOutput = generateDataset(num_samples, sample_length, max_value, vocab_size)
         
-        self.assertEqual(len(enc_in), 4)
-        self.assertEqual(enc_in[0].shape, [11])
+        self.assertEqual(trainEncoderInput[0].shape, [11])
 
-        self.assertEqual(len(dec_in), 4)
-        self.assertEqual(dec_in[0].shape, [11])
+        self.assertEqual(trainDecoderInput[0].shape, [11])
+
+        self.assertEqual(trainDecoderOutput[0].shape, [11, 11])
     
     def test_tensorContents(self):
-        dataset = ArtificialDataset(4, 10, 100)
+        num_samples = 2 # number of samples to generate
+        sample_length = 10 # Length of input sequence
+        max_value = 100 # Upper bound (range.random()) to generate a number
+        vocab_size = max_value + 2 # +2 for SOS and EOS
 
-        enc_in = []
-        dec_in = []
-        dec_out = []
-        for d in dataset:
-             enc_in.append(d['enc_in'])
-             dec_in.append(d['dec_in'])
-             dec_out.append(d['dec_out'])
+        trainEncoderInput, trainDecoderInput, trainDecoderOutput = generateDataset(num_samples, sample_length, max_value, vocab_size)
         
-        
-        # Sort encoder's input
-        sortedInput = np.sort(enc_in[0].numpy())
+        encoderInput = trainEncoderInput[0].numpy()
+        decoderInput = trainDecoderInput[0].numpy()
 
-        # Convert encoder's input into one-hot
-        in_array = tf.one_hot(tf.cast(sortedInput, tf.int32), 101)
-        dec_array = dec_out[0].numpy()
+        # Sorted Encoder input should be equal to Decoder's Input
+        # The SOS and EOS should are not considered
+        self.assertTrue(np.all(np.sort(encoderInput[1:]) == decoderInput[1:]))
 
-        # Compare encoder's input with to decoder's output
-        self.assertTrue(np.all(in_array == dec_array))
-
-        # Decoder input should start with START CODE (101)
-        out_array = dec_in[0].numpy()
-        self.assertEqual(out_array[0], 101)
         
         
 
