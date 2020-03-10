@@ -2,7 +2,7 @@ import tensorflow as tf
 from models.bahdanau.attention import BahdanauAttention
 
 
-class Decoder(tf.keras.Model):
+class Decoder(tf.keras.layers.Layer):
     def __init__(self, vocab_size, embedding_dim, dec_units):
         super(Decoder, self).__init__()
 

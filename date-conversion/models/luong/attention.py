@@ -7,17 +7,17 @@ class LuongAttention(Layer):
     
     self.attentionDot = Dot((2, 2), name="attentionDot")
 
-    self.attention_layer = Activation("softmax", name="attention")
+    # self.attention_layer = Activation("softmax", name="attention")
 
     self.context = Dot((2, 1), name="context")
 
 
   def call(self, decoder_output, encoder_output):
-    attention = self.attentionDot([decoder_output, encoder_output])
+    score = self.attentionDot([decoder_output, encoder_output])
 
-    attention = self.attention_layer(attention)
+    attention_weights = tf.nn.softmax(score, axis=1) #self.attention_layer(attention)
 
-    context_vector = self.context([attention, encoder_output])
+    context_vector = self.context([attention_weights, encoder_output])
 
 
-    return context_vector, attention
+    return context_vector, attention_weights

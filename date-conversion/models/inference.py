@@ -2,6 +2,8 @@ import sys
 sys.path.append(".")
 from dataset.date_format import encodeInputDateStrings, OUTPUT_LENGTH, START_CODE, OUTPUT_VOCAB
 import numpy as np
+import tensorflow as tf
+from tensorflow.keras.models import Model
 
 def runSeq2SeqInference(model, inputStr):
     # Encode encoder's input date
@@ -12,6 +14,11 @@ def runSeq2SeqInference(model, inputStr):
     # Add start code into decoder
     decoderInput[0,0] = START_CODE
 
+    # decoder = model.get_layer('decoder')
+    # attention = decoder.get_layer('luong_attention')
+    # att_layer = attention.attention_layer
+    # model.outputs.append(att_layer.output)
+
     for i in range(1, OUTPUT_LENGTH):
         # Make a predition
         predictOut = model.predict([encoderInput, decoderInput])
@@ -20,8 +27,14 @@ def runSeq2SeqInference(model, inputStr):
         # Append it to the decoder's input
         decoderInput[0, i] = output
 
+    # Make new model that will also return the attention weights
+    finalStepModel = Model(
+        inputs = model.input,
+        outputs = [model.output, model.get_layer('decoder').output[1]]
+    )
+
     # Make the prediction of the last char
-    finalPredictOut = model.predict([encoderInput, decoderInput])
+    finalPredictOut, attention_weights = finalStepModel.predict([encoderInput, decoderInput])
     decoderFinalOutput = finalPredictOut.argmax(2)[0, OUTPUT_LENGTH-1]
 
     # Map the indices to chars
@@ -31,7 +44,7 @@ def runSeq2SeqInference(model, inputStr):
 
     outputStr += OUTPUT_VOCAB[int(decoderFinalOutput)]
 
-    return outputStr
+    return outputStr, attention_weights
 
 
 if __name__ == "__main__":

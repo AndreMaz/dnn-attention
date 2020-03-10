@@ -11,16 +11,15 @@ def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength, embe
     encoder_input = Input(
         shape=(inputLength,), name='embeddingEncoderInput')
 
-    encoder = Encoder(inputVocabSize, embeddingDims, lstmUnits)
-
+    encoder = Encoder(inputVocabSize, embeddingDims, lstmUnits, inputLength)
     encoder_output, dec_init_state = encoder(encoder_input)
 
     # Decoder
     decoder_input = Input(
         shape=(outputLength,), name='embeddingDecoderInput')
-    decoder = Decoder(outputVocabSize, embeddingDims, lstmUnits)
 
-    decoderCombinedContext = decoder(decoder_input, dec_init_state, encoder_output)
+    decoder = Decoder(outputVocabSize, embeddingDims, lstmUnits, outputLength)
+    decoderCombinedContext, attention_weights = decoder(decoder_input, dec_init_state, encoder_output)
 
     # Prediction Layers
     outputGeneratorTanh = TimeDistributed(
