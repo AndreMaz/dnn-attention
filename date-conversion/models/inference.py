@@ -14,11 +14,6 @@ def runSeq2SeqInference(model, inputStr):
     # Add start code into decoder
     decoderInput[0,0] = START_CODE
 
-    # decoder = model.get_layer('decoder')
-    # attention = decoder.get_layer('luong_attention')
-    # att_layer = attention.attention_layer
-    # model.outputs.append(att_layer.output)
-
     for i in range(1, OUTPUT_LENGTH):
         # Make a predition
         predictOut = model.predict([encoderInput, decoderInput])
@@ -26,6 +21,10 @@ def runSeq2SeqInference(model, inputStr):
         output = predictOut.argmax(2)[0, i-1]
         # Append it to the decoder's input
         decoderInput[0, i] = output
+
+    # Make the prediction of the last char
+    # finalPredictOut = model.predict([encoderInput, decoderInput])
+    # decoderFinalOutput = finalPredictOut.argmax(2)[0, OUTPUT_LENGTH-1]
 
     # Make new model that will also return the attention weights
     finalStepModel = Model(
@@ -36,6 +35,7 @@ def runSeq2SeqInference(model, inputStr):
     # Make the prediction of the last char
     finalPredictOut, attention_weights = finalStepModel.predict([encoderInput, decoderInput])
     decoderFinalOutput = finalPredictOut.argmax(2)[0, OUTPUT_LENGTH-1]
+
 
     # Map the indices to chars
     outputStr = ""

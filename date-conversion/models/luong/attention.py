@@ -7,7 +7,7 @@ class LuongAttention(Layer):
     
     self.attentionDot = Dot((2, 2), name="attentionDot")
 
-    # self.attention_layer = Activation("softmax", name="attention")
+    self.attention_layer = Activation("softmax", name="attentionSoftMax")
 
     self.context = Dot((2, 1), name="context")
 
@@ -16,7 +16,9 @@ class LuongAttention(Layer):
 
     attention = self.attentionDot([decoderLSTMOutput, encoderLSTMOutput])
 
-    attention = tf.nn.softmax(attention, axis=1) #self.attention_layer(attention)
+    #self.attention_layer(attention)
+    # attention = tf.nn.softmax(attention, axis=1)
+    attention = self.attention_layer(attention)
 
     context_vector = self.context([attention, encoderLSTMOutput])
 

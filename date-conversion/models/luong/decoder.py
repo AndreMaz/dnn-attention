@@ -39,4 +39,6 @@ class Decoder(tf.keras.Model):
         
         decoderCombinedContext = self.concat([context_vector, decoderLSTMOutput])
 
+        self.attention_weights = attention_weights
+
         return decoderCombinedContext, attention_weights

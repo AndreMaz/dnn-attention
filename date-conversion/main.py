@@ -12,7 +12,7 @@ import sys
 import matplotlib.pyplot as plt
 
 minYear = '1950-01-01'
-maxYear = '2049-01-01'
+maxYear = '1955-01-01'
 
 embeddingDims = 64
 lstmUnits = 64
@@ -52,7 +52,7 @@ def main(minYear: str, maxYear: str) -> None:
 
     # Test the model
     
-    numTests = 1
+    numTests = 10
     for n in range(numTests):
         for _, fn in enumerate(INPUT_FNS):
             # Generate input string
@@ -65,7 +65,7 @@ def main(minYear: str, maxYear: str) -> None:
             print(f"Correct Answer: {correctAnswer}")
             # Run the inference
             outputStr, attention_weights = runSeq2SeqInference(model, inputStr)
-            # plotAttention(attention_weights, inputStr, outputStr, INPUT_LENGTH, OUTPUT_LENGTH)
+            plotAttention(attention_weights, inputStr, outputStr, INPUT_LENGTH, OUTPUT_LENGTH)
 
             print(f"Predicted Answer: {outputStr}")
             if (outputStr == correctAnswer):
