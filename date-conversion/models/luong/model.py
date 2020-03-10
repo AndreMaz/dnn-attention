@@ -8,18 +8,18 @@ from models.luong.decoder import Decoder
 def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength, embeddingDims, lstmUnits):
 
     # Encoder
-    encoder_input = Input(
+    encoderEmbeddingOutput = Input(
         shape=(inputLength,), name='embeddingEncoderInput')
 
     encoder = Encoder(inputVocabSize, embeddingDims, lstmUnits, inputLength)
-    encoder_output, dec_init_state = encoder(encoder_input)
+    encoderLSTMOutput, encoderLastState = encoder(encoderEmbeddingOutput)
 
     # Decoder
-    decoder_input = Input(
+    decoderEmbeddingInput = Input(
         shape=(outputLength,), name='embeddingDecoderInput')
 
     decoder = Decoder(outputVocabSize, embeddingDims, lstmUnits, outputLength)
-    decoderCombinedContext, attention_weights = decoder(decoder_input, dec_init_state, encoder_output)
+    decoderCombinedContext, attention_weights = decoder(decoderEmbeddingInput, encoderLSTMOutput, encoderLastState)
 
     # Prediction Layers
     outputGeneratorTanh = TimeDistributed(
@@ -33,7 +33,7 @@ def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength, embe
     )(outputGeneratorTanh)
 
     model = Model(
-        inputs=[encoder_input, decoder_input],
+        inputs=[encoderEmbeddingOutput, decoderEmbeddingInput],
         outputs=outputGenerator
     )
 

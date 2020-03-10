@@ -1,4 +1,4 @@
-from tensorflow.keras.layers import Layer, Dense, Softmax, Dot, Activation
+from tensorflow.keras.layers import Layer, Embedding, LSTM, TimeDistributed, Dense, Dot, Activation, Concatenate
 import tensorflow as tf
 
 class LuongAttention(Layer):
@@ -12,12 +12,12 @@ class LuongAttention(Layer):
     self.context = Dot((2, 1), name="context")
 
 
-  def call(self, decoder_output, encoder_output):
-    score = self.attentionDot([decoder_output, encoder_output])
+  def call(self, decoderLSTMOutput, encoderLSTMOutput):
 
-    attention_weights = tf.nn.softmax(score, axis=1) #self.attention_layer(attention)
+    attention = self.attentionDot([decoderLSTMOutput, encoderLSTMOutput])
 
-    context_vector = self.context([attention_weights, encoder_output])
+    attention = tf.nn.softmax(attention, axis=1) #self.attention_layer(attention)
 
+    context_vector = self.context([attention, encoderLSTMOutput])
 
-    return context_vector, attention_weights
+    return context_vector, attention

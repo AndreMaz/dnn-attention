@@ -1,41 +1,42 @@
 import tensorflow as tf
+from tensorflow.keras.layers import Input, Embedding, LSTM, TimeDistributed, Dense, Dot, Activation, Concatenate
 from models.luong.attention import LuongAttention
 
 
 class Decoder(tf.keras.Model):
-    def __init__(self, vocab_size, embedding_dim, dec_units, outputLength):
+    def __init__(self, outputVocabSize, embeddingDims, lstmUnits, outputLength):
         super(Decoder, self).__init__()
 
-        self.embedding_dim = embedding_dim
-        self.dec_units = dec_units
+        # self.embedding_dim = embedding_dim
+        # self.dec_units = dec_units
 
-        self.embedding = tf.keras.layers.Embedding(
-            vocab_size,
-            embedding_dim,
-            input_length = outputLength,
+        self.embedding = Embedding(
+            outputVocabSize,
+            embeddingDims,
+            input_length=outputLength,
             mask_zero=True,
             name='decoderEmbedding'
         )
 
-        self.lstm = tf.keras.layers.LSTM(
-            self.dec_units,
+        self.lstm = LSTM(
+            lstmUnits,
             return_sequences=True,
             name="decoderLSMT"
         )
         
         self.attention = LuongAttention()
 
-        self.concat = tf.keras.layers.Concatenate(name="combinedContext")
+        self.concat = Concatenate(name="combinedContext")
 
-    def call(self, dec_input, dec_init_state, encoder_output):
+    def call(self, decoderEmbeddingInput, encoderLSTMOutput, encoderLastState):
          # Convert input to embeddings
-        dec_input = self.embedding(dec_input)
+        decoderEmbeddingOutput = self.embedding(decoderEmbeddingInput)
 
         # Run in trough the LSTM
-        decoder_output = self.lstm(dec_input, initial_state=[dec_init_state, dec_init_state])
+        decoderLSTMOutput = self.lstm(decoderEmbeddingOutput, initial_state=[encoderLastState, encoderLastState])
         
-        context_vector, attention_weights = self.attention(decoder_output, encoder_output)
+        context_vector, attention_weights = self.attention(decoderLSTMOutput, encoderLSTMOutput)
         
-        decoderCombinedContext = self.concat(([context_vector, decoder_output]))
+        decoderCombinedContext = self.concat([context_vector, decoderLSTMOutput])
 
         return decoderCombinedContext, attention_weights
