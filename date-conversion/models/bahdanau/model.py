@@ -22,7 +22,9 @@ def createModel(inputVocabSize, outputVocabSize, inputLength, outputLength, embe
         shape=(outputLength,), name='embeddingDecoderInput')
 
     decoder = Decoder(outputVocabSize, embeddingDims, lstmUnits)
-    decoderOutput = decoder(decoderEmbeddingInput, [
+    # Ignore attention at this point
+    # We only need it during testing
+    decoderOutput, _ = decoder(decoderEmbeddingInput, [
                             encoderLastHiddenState, encoderLastCarryState], encoderHiddenStates)
 
     # Prediction Layers

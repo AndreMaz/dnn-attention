@@ -24,7 +24,7 @@ def runner():
     ### Decoder
     decoderEmbeddingInput = encodeOutputDateStrings(["2020-08-01", "2020-08-01"])
     decoder = Decoder(outputVocabSize, embeddingDims, lstmUnits)
-    decoderOutput = decoder(decoderEmbeddingInput, [encoderLastHiddenState, encoderLastCarryState], encoderHiddenStates)
+    decoderOutput, attention_weights = decoder(decoderEmbeddingInput, [encoderLastHiddenState, encoderLastCarryState], encoderHiddenStates)
     
     outputGeneratorTanh = TimeDistributed(
         Dense(lstmUnits, activation="tanh"),

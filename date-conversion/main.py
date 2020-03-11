@@ -52,9 +52,10 @@ def main(minYear: str, maxYear: str) -> None:
         # callbacks = [tensorboard_callback]
     )
 
-    # Test the model
-    # Make new model that will also return the attention weights
-    # It will produce two outputs: the actual prediction and the attention weights
+    #### TEST THE MODEL ####
+
+    # Create new model that will also return the attention weights
+    # New model will produce two outputs: the actual prediction and the attention weights
     model = Model(
         inputs = model.input,
         # Add attention_weights to the output list
@@ -62,6 +63,9 @@ def main(minYear: str, maxYear: str) -> None:
     )
 
     numTests = 10
+    totalTests = numTests*len(INPUT_FNS)
+    correctPredictions = 0
+    wrongPredictions = 0
     for n in range(numTests):
         for _, fn in enumerate(INPUT_FNS):
             # Generate input string
@@ -74,13 +78,17 @@ def main(minYear: str, maxYear: str) -> None:
             print(f"Correct Answer: {correctAnswer}")
             # Run the inference
             outputStr, attention_weights = runSeq2SeqInference(model, inputStr)
-            # plotAttention(attention_weights, inputStr, outputStr, INPUT_LENGTH, OUTPUT_LENGTH)
+            plotAttention(attention_weights, inputStr, outputStr, INPUT_LENGTH, OUTPUT_LENGTH)
 
             print(f"Predicted Answer: {outputStr}")
             if (outputStr == correctAnswer):
+                correctPredictions += 1
                 print('CORRECT')
             else:
+                wrongPredictions += 1
                 print('WRONG!')
+    
+    print(f"Correct Predictions: {correctPredictions/totalTests} || Wrong Predictions: {wrongPredictions/totalTests}")
 
 
 def plotAttention(attention_weights, inputStr, outputStr, INPUT_LENGTH, OUTPUT_LENGTH):

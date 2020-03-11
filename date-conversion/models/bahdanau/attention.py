@@ -30,4 +30,7 @@ class BahdanauAttention(Layer):
     # Sum along 1 axis to get [batch_size, hidden_size] shape
     context_vector = tf.reduce_sum(context_vector, axis=1)
 
+    # Remove last dimension as it is not necessary
+    attention_weights = tf.squeeze(attention_weights, axis=2)
+
     return context_vector, attention_weights

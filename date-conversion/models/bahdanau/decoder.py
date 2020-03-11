@@ -30,6 +30,9 @@ class Decoder(tf.keras.layers.Layer):
         perStepInputs = tf.unstack(dec_input, axis=1)
         perStepOutputs = []
 
+        # List that will store the attention weights for each time-step
+        perStepAttentionWeights = []
+
         prevDecoderHiddenState = dec_hidden[0]
         prevDecoderCarryState = dec_hidden[1]
 
@@ -38,6 +41,9 @@ class Decoder(tf.keras.layers.Layer):
             # Compute context vector
             contextVector, attention_weights = self.attention(
                 prevDecoderHiddenState, enc_outputs)
+
+            # Store the attention slice
+            perStepAttentionWeights.append(attention_weights)
 
             # Concatenate with current input
             currentInput = tf.concat([currentInput, contextVector], axis=1)
@@ -56,6 +62,8 @@ class Decoder(tf.keras.layers.Layer):
         # Convert list back to tensor
         # Will create a time-major Tensor [time_steps, batch_size, features]
         outTensor = tf.convert_to_tensor(perStepOutputs, dtype="float32")
+        # Do the same thing for attention
+        attention = tf.convert_to_tensor(perStepAttentionWeights, dtype="float32")
 
         # Put the data back into batch-major shape [batch_size, time_steps, features]
-        return tf.transpose(outTensor, [1, 0, 2])
+        return tf.transpose(outTensor, [1, 0, 2]), tf.transpose(attention, [1, 0, 2])
