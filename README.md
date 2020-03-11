@@ -4,8 +4,9 @@ This repo contains implementation of:
 - Luong's Dot Attention. Used in [Date Conversion Problem](#date-conversion-problem)
 - Bahdanau's Attention. Used in [Date Conversion Problem](#date-conversion-problem)
 - Pointer Networks a.k.a. Ptr-Net. Used in [Sorting Numbers](#sorting-numbers)
+- Pointer Networks with Masking. Used in [Sorting Numbers](#sorting-numbers)
 
-I've tried, as much as possible, to avoid building custom layers in order to ease the readability of the code. Also, note that the code in `/model` folders contains repeated elements (e.g., `Encoder` is the same for all the models). Again, this is done to ease the readability and portability of the code. Each model is contained in a single folder, so you can simply copy it and it should work for you and your own problem.
+I've tried, as much as possible, to avoid building custom layers in order to ease the readability of the code. Also, note that the code in `/model` folders contains repeated elements (e.g., `Encoder` is the same for all the models). Again, this is done to ease the readability and portability of the code. Each model is contained in a single folder, so (in theory) you can simply copy it and it should work for you and your own problem.
 
 ## Date Conversion Problem
 Convert dates in different formats (e.g., `"08/30/21"`, `"080120"`, `"AUG 01, 2020"`) into ISO standard (e.g., `"2021-08-30"`, `"2020-08-01"`) format.
@@ -46,7 +47,7 @@ Sorts numbers in an ascending order with Pointer Networks.
 > Note: Pointer Networks are capable of dealing with inputs of variable length. However, after using `model.compile()` the model is no longer capable of accepting input sequences of different length. I think the only way of achieving this is by not using `model.compile()` and computing the loss and grads manually. This is a `ToDo`...
 
 ### Input Example
-Sorting numbers between 0 and 9. The number `10` at the first position is the end-of-sequence (EOS).
+Sorting numbers between `0` and `9`. The number `10` at the first position is the end-of-sequence (EOS).
 
 **Encoder Input**
 ```bash
@@ -89,12 +90,12 @@ Interesting behavior happens at `step 1` and `step 2`. It shows that at these st
 
 ### Running 
 ```bash
-python sorting-numbers/main.py <model-name> # One of "pointer". If not provided "pointer" will be used
+python sorting-numbers/main.py <model-name> # One of "pointer" or "pointer-masking". If not provided "pointer-masking" will be used
 ```
 
 ## Useful Links
 A short list of links that I've found useful while I was learning about attention mechanisms:
-- Tensorflow.js [data-conversion-attention](https://github.com/tensorflow/tfjs-examples/tree/master/date-conversion-attention) example. I've simply ported the dataset generation script and Luong's attention to Python. All the credit goes to the TF team and the people that built the model.
+- Tensorflow.js [data-conversion-attention](https://github.com/tensorflow/tfjs-examples/tree/master/date-conversion-attention) example. I've simply ported the dataset generation script and Luong's attention (slightly refactored). Nevertheless, All the credit goes to the TF team and the people that built the model.
 - [Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/pdf/1409.0473.pdf)
 - [Effective Approaches to Attention-based Neural Machine Translation](https://arxiv.org/abs/1508.04025)
 - [Pointer Networks](https://arxiv.org/abs/1506.03134)
