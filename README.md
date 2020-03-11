@@ -76,7 +76,7 @@ Char "-": Index 12
 
 **Possible Input Formats**
 
-Number of supported input formats: 20
+Number input formats: 20
 ```
 1 - 01OCT2019
 2 - 100119
@@ -109,6 +109,7 @@ Tensor
 ```
 
 **Decoder's input example for `2019-10-01`**
+
 Decoder is fed with the sorted sequence a.k.a [teacher forcing](https://machinelearningmastery.com/teacher-forcing-for-recurrent-neural-networks/). The number `1` at the first position is the start-of-sequence (SOS).
 
 ```bash
@@ -117,8 +118,11 @@ Tensor
 ```
 
 **Decoder's expected output example for `2019-10-01`**
+
+Shape is [10, 13]. 10 is the input length and 13 is the output vocabulary size.
+
 ```bash
-Tensor
+Tensor(
     [[[0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -128,7 +132,7 @@ Tensor
       [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
       [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]]
+      [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], shape=(1, 10, 13), dtype=int32)
 ```
 
 ### Attention Examples
@@ -141,7 +145,9 @@ Tensor
 
 ### Running 
 ```bash
-python date-conversion/main.py <model-name> # One of "seq2seq", "luong" or "bahdanau". If not provided "luong" will be used
+python date-conversion/main.py <model-name> <0/1> 
+# <model-name> -  One of "seq2seq", "luong" or "bahdanau". If not provided "luong" will be used.
+# <0/1> - 1 to plot the attention. If not provided won't plot the attention.
 ```
 
 ### Run Unit Tests
@@ -162,14 +168,14 @@ Sorts numbers in an ascending order with Pointer Networks. For more info check t
 
 ### Input/Output Example
 
-Sorting numbers between `0` and `9`. The number `10` at the first position is the end-of-sequence (EOS).
+Sorting numbers between `0` and `9`. The number `10` at the first position is the end-of-sequence (EOS). During the decoding process the last pointer will point to EOS.
 
-**Encoder Input**
+**Encoder's Input**
 ```bash
 tf.Tensor([[10.  2.  9.  3.  0.  5.  1.  8.  6.  4.  7.]], shape=(1, 11), dtype=float32)
 ```
 
-**Decoder Input**
+**Decoder's Input**
 
 Decoder is fed with the sorted sequence a.k.a [teacher forcing](https://machinelearningmastery.com/teacher-forcing-for-recurrent-neural-networks/). The number `11` at the first position is the start-of-sequence (SOS).
 
@@ -177,9 +183,9 @@ Decoder is fed with the sorted sequence a.k.a [teacher forcing](https://machinel
 tf.Tensor([[11.  0.  1.  2.  3.  4.  5.  6.  7.  8.  9.]], shape=(1, 11), dtype=float32)
 ```
 
-**Decoder Expected Output**
+**Decoder's Expected Output**
 
-One hot encoding where each row represents represents a time-step and the location to which the `pointer` should point. The last row should point to the first position of encoder's input, which is the EOS symbol.
+One-hot encoding where each row represents represents a time-step and the location to which the `pointer` should point. The last row should point to the first position of encoder's input, which is the EOS symbol.
 
 ```bash
 tf.Tensor(

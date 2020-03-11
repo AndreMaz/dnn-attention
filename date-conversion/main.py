@@ -18,7 +18,7 @@ maxYear = '2050-01-01'
 embeddingDims = 64
 lstmUnits = 64
 
-def main(minYear: str, maxYear: str, plotAttention = False) -> None:
+def main(minYear: str, maxYear: str, toPlotAttention = False) -> None:
     # Generate dataset
     trainEncoderInput, trainDecoderInput, trainDecoderOutput, valEncoderInput, valDecoderInput, valDecoderOutput, testDateTuples = generator.generateDataSet(
         minYear, maxYear)
@@ -26,6 +26,7 @@ def main(minYear: str, maxYear: str, plotAttention = False) -> None:
     # Get model name
     try:
         modelName = sys.argv[1]
+        toPlotAttention = True if int(sys.argv[2]) == 1 else False
     except:
         # Use Luong by default
         modelName = 'luong'
@@ -52,15 +53,16 @@ def main(minYear: str, maxYear: str, plotAttention = False) -> None:
         # callbacks = [tensorboard_callback]
     )
 
-    #### TEST THE MODEL ####
+    #### TEST THE MODEL ###
 
     # Create new model that will also return the attention weights
     # New model will produce two outputs: the actual prediction and the attention weights
-    model = Model(
-        inputs = model.input,
-        # Add attention_weights to the output list
-        outputs = [model.output, model.get_layer('decoder').output[1]]
-    )
+    if (modelName != 'seq2seq'): # Sequence 2 Sequence model doesn't have attention so we don't need to do this
+        model = Model(
+            inputs = model.input,
+            # Add attention_weights to the output list
+            outputs = [model.output, model.get_layer('decoder').output[1]]
+        )
 
     numTests = 10
     totalTests = numTests*len(INPUT_FNS)
@@ -77,10 +79,13 @@ def main(minYear: str, maxYear: str, plotAttention = False) -> None:
             
             print(f"Correct Answer: {correctAnswer}")
             # Run the inference
-            outputStr, attention_weights = runSeq2SeqInference(model, inputStr)
+            if (modelName != 'seq2seq'):
+                outputStr, attention_weights = runSeq2SeqInference(modelName, model, inputStr)
 
-            if (plotAttention == True):
-                plotAttention(attention_weights, inputStr, outputStr, INPUT_LENGTH, OUTPUT_LENGTH)
+                if (toPlotAttention == True):
+                    plotAttention(attention_weights, inputStr, outputStr, INPUT_LENGTH, OUTPUT_LENGTH)
+            else:
+                outputStr = runSeq2SeqInference(modelName, model, inputStr)
 
             print(f"Predicted Answer: {outputStr}")
             if (outputStr == correctAnswer):
@@ -94,7 +99,6 @@ def main(minYear: str, maxYear: str, plotAttention = False) -> None:
 
 
 def plotAttention(attention_weights, inputStr, outputStr, INPUT_LENGTH, OUTPUT_LENGTH):
-    print(attention_weights[0].shape)
     plt.matshow(attention_weights[0])
     
     inputChars = list(inputStr)
