@@ -7,6 +7,7 @@ models = {
 }
 
 def model_factory(name, vocab_size, input_length, embedding_dims, lstm_units):
+    print(name)
     try:
         createModel = models[name]
         print(f'Using "{name.upper()}" model')

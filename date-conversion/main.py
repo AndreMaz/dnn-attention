@@ -18,7 +18,7 @@ maxYear = '2050-01-01'
 embeddingDims = 64
 lstmUnits = 64
 
-def main(minYear: str, maxYear: str) -> None:
+def main(minYear: str, maxYear: str, plotAttention = False) -> None:
     # Generate dataset
     trainEncoderInput, trainDecoderInput, trainDecoderOutput, valEncoderInput, valDecoderInput, valDecoderOutput, testDateTuples = generator.generateDataSet(
         minYear, maxYear)
@@ -78,7 +78,9 @@ def main(minYear: str, maxYear: str) -> None:
             print(f"Correct Answer: {correctAnswer}")
             # Run the inference
             outputStr, attention_weights = runSeq2SeqInference(model, inputStr)
-            plotAttention(attention_weights, inputStr, outputStr, INPUT_LENGTH, OUTPUT_LENGTH)
+
+            if (plotAttention == True):
+                plotAttention(attention_weights, inputStr, outputStr, INPUT_LENGTH, OUTPUT_LENGTH)
 
             print(f"Predicted Answer: {outputStr}")
             if (outputStr == correctAnswer):

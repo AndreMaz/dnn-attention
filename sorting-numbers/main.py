@@ -4,6 +4,7 @@ from models.model_factory import model_factory
 from models.inference import runSeq2SeqInference
 import tensorflow as tf
 import numpy as np
+import sys
 
 # For plotting
 import matplotlib.pyplot as plt
@@ -14,8 +15,8 @@ embedding_dims = 64
 lstm_units = 64
 
 # Training and validations size
-num_samples_training = 50_000
-num_sample_validation = 50_000
+num_samples_training = 5000
+num_sample_validation = 5000
 
 # Length of input sequence
 sample_length = 10
@@ -23,16 +24,19 @@ sample_length = 10
 # Upper bound (range.random()) to generate a number
 max_value = 100
 
-vocab_size = max_value + 2 # +2 for SOS and EOS
-input_length = sample_length + 1 # For special chars at the beggining of input
+vocab_size = max_value + 2  # +2 for SOS and EOS
+input_length = sample_length + 1  # For special chars at the beggining of input
 
-def main() -> None:
+
+def main(plotAttention = False) -> None:
     print('Generating Dataset')
     # generate training dataset
-    trainEncoderInput, trainDecoderInput, trainDecoderOutput = generateDataset(num_samples_training, sample_length, max_value, vocab_size)
+    trainEncoderInput, trainDecoderInput, trainDecoderOutput = generateDataset(
+        num_samples_training, sample_length, max_value, vocab_size)
 
     # generate validation dataset
-    valEncoderInput, valDecoderInput, valDecoderOutput = generateDataset(num_sample_validation, sample_length, max_value, vocab_size)
+    valEncoderInput, valDecoderInput, valDecoderOutput = generateDataset(
+        num_sample_validation, sample_length, max_value, vocab_size)
     print('Dataset Generated!')
 
     # Get model name
@@ -43,9 +47,10 @@ def main() -> None:
         modelName = 'pointer-masking'
 
     # Create model
-    model = model_factory(modelName, vocab_size, input_length, embedding_dims, lstm_units)
+    model = model_factory(modelName, vocab_size,
+                          input_length, embedding_dims, lstm_units)
     model.summary(line_length=180)
-    
+
     model.fit(
         x=[trainEncoderInput, trainDecoderInput],
         y=trainDecoderOutput,
@@ -60,7 +65,8 @@ def main() -> None:
     num_samples_tests = 200
     correctPredictions = 0
     wrongPredictions = 0
-    trainEncoderInput, _, _ = generateDataset(num_samples_tests, sample_length, max_value, vocab_size)
+    trainEncoderInput, _, _ = generateDataset(
+        num_samples_tests, sample_length, max_value, vocab_size)
     for _, inputEntry in enumerate(trainEncoderInput):
         print('__________________________________________________')
 
@@ -78,8 +84,10 @@ def main() -> None:
         inputEntry = tf.expand_dims(inputEntry, 0)
 
         # Run the inference and generate predicted output
-        predictedAnswer, attention_weights = runSeq2SeqInference(model, inputEntry, vocab_size, input_length, max_value)
-        plotAttention(attention_weights, inputEntry)        
+        predictedAnswer, attention_weights = runSeq2SeqInference(
+            model, inputEntry, vocab_size, input_length, max_value)
+        if (plotAttention == True):
+            plotAttention(attention_weights, inputEntry)
         print(predictedAnswer)
 
         # Compute the diff between the correct answer and predicted
@@ -87,22 +95,22 @@ def main() -> None:
         diff = []
         for index, _ in enumerate(correctAnswer):
             diff.append(correctAnswer[index] - predictedAnswer[index])
-        
+
         # If all numbers are equal to 0
-        if (all(result== 0 for (result) in diff)):
+        if (all(result == 0 for (result) in diff)):
             correctPredictions += 1
             print('______________________OK__________________________')
         else:
             wrongPredictions += 1
             print('_____________________WRONG!_______________________')
-    
-    print(f"Correct Predictions: {correctPredictions/num_samples_tests} || Wrong Predictions: {wrongPredictions/num_samples_tests}")
+
+    print(
+        f"Correct Predictions: {correctPredictions/num_samples_tests} || Wrong Predictions: {wrongPredictions/num_samples_tests}")
 
 
 def plotAttention(attention_weights, inputEntry):
     # print(attention_weights[0].shape)
     plt.matshow(attention_weights[0])
-    
 
     xTicksNames = list(inputEntry[0].numpy().astype("int16"))
     inputLength = len(xTicksNames)
@@ -112,13 +120,14 @@ def plotAttention(attention_weights, inputEntry):
         yTicksNames.append(f"step {i}")
 
     plt.yticks(range(inputLength), yTicksNames)
-    
+
     plt.xticks(range(inputLength), xTicksNames)
 
     plt.ylabel('Pointer Probability')
     plt.xlabel('Input Sequence')
 
     plt.show(block=True)
+
 
 if __name__ == "__main__":
     main()
