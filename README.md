@@ -144,7 +144,9 @@ Input: `NOV 01, 98` Output: `1998-11-01`
 ![image](./media/luong-attention.png)
 
 #### Bahdanau Attention
+
 Input: `APR 04. 1953` Output: `1953-04-04`
+
 ![image](./media/bahdanau-attention.png)
 
 ### Running 
