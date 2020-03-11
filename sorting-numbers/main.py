@@ -5,20 +5,23 @@ from models.inference import runSeq2SeqInference
 import tensorflow as tf
 import numpy as np
 
+# For plotting
+import matplotlib.pyplot as plt
+
 # Embedding dims to represent a number
 embedding_dims = 64
 # Output dimensionality of LSTM
 lstm_units = 64
 
 # Training and validations size
-num_samples_training = 150_000
+num_samples_training = 50_000
 num_sample_validation = 50_000
 
 # Length of input sequence
 sample_length = 10
 
 # Upper bound (range.random()) to generate a number
-max_value = 100
+max_value = 50
 
 vocab_size = max_value + 2 # +2 for SOS and EOS
 input_length = sample_length + 1 # For special chars at the beggining of input
@@ -41,12 +44,12 @@ def main() -> None:
 
     # Create model
     model = model_factory(modelName, vocab_size, input_length, embedding_dims, lstm_units)
-    model.summary(line_length=200)
+    model.summary(line_length=180)
     
     model.fit(
         x=[trainEncoderInput, trainDecoderInput],
         y=trainDecoderOutput,
-        epochs=15,
+        epochs=3,
         batch_size=128,
         shuffle=True,
         validation_data=([valEncoderInput, valDecoderInput], valDecoderOutput),
@@ -75,7 +78,8 @@ def main() -> None:
         inputEntry = tf.expand_dims(inputEntry, 0)
 
         # Run the inference and generate predicted output
-        predictedAnswer = runSeq2SeqInference(model, inputEntry, vocab_size, input_length, max_value)
+        predictedAnswer, attention_weights = runSeq2SeqInference(model, inputEntry, vocab_size, input_length, max_value)
+        plotAttention(attention_weights, inputEntry)        
         print(predictedAnswer)
 
         # Compute the diff between the correct answer and predicted
@@ -93,6 +97,33 @@ def main() -> None:
             print('_____________________WRONG!_______________________')
     
     print(f"Correct Predictions: {correctPredictions/num_samples_tests} || Wrong Predictions: {wrongPredictions/num_samples_tests}")
+
+
+def plotAttention(attention_weights, inputEntry):
+    print(attention_weights[0].shape)
+    plt.matshow(attention_weights[0])
+    
+
+    xTicksNames = list(inputEntry[0].numpy().astype("int16"))
+    inputLength = len(xTicksNames)
+
+    yTicksNames = []
+    for i in range(inputLength):
+        yTicksNames.append(f"step {i}")
+
+    # outputChars = list(outputStr)
+    # outputLength = len(outputChars)
+    # diffOutput = OUTPUT_LENGTH - outputLength
+    # yTicksNames = outputChars + [' '] * diffOutput
+
+    plt.yticks(range(inputLength), yTicksNames)
+    
+    plt.xticks(range(inputLength), xTicksNames)
+
+    plt.ylabel('Pointer Probability')
+    plt.xlabel('Input Sequence')
+
+    plt.show(block=True)
 
 if __name__ == "__main__":
     main()

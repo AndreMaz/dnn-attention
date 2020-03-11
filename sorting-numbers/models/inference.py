@@ -28,7 +28,7 @@ def runSeq2SeqInference(model, encoderInput, vocab_size, input_length, max_value
 
     # Return only the number sequence
     # 1st element is SOS
-    return list(decoderInput[0].astype("int16"))[1:]
+    return list(decoderInput[0].astype("int16"))[1:], finalPrediction
 
 
 if __name__ == "__main__":

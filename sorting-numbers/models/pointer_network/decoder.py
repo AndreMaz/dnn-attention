@@ -28,4 +28,5 @@ class Decoder(tf.keras.Model):
 
         # Compute the pointers
         pointers = self.attention(decoder_outputs, enc_outputs)
+        
         return pointers

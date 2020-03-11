@@ -40,10 +40,10 @@ class PointerAttention(Layer):
 
       # Apply softmax
       # pointer = tf.nn.softmax(score, axis=1)
-      pointer = self.attention(score)
+      attention_pointer = self.attention(score)
       
       # Store the pointer
-      pointerList.append(pointer)
+      pointerList.append(attention_pointer)
     
     # Convert list back to tensor
     # Will create a time-major Tensor [time_steps, batch_size, features]

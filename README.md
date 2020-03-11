@@ -1,9 +1,9 @@
 # Sequence 2 Sequence with Attention Mechanisms
 This repo contains implementation of:
-- Classical Sequence 2 Sequence model without attention. [Date Conversion Problem](#date-conversion-problem)
-- Luong's Dot Attention. [Date Conversion Problem](#date-conversion-problem)
-- Bahdanau's Attention. [Date Conversion Problem](#date-conversion-problem)
-- Pointer Networks a.k.a. Ptr-Net. [Sorting Numbers](#sorting-numbers)
+- Classical Sequence 2 Sequence model without attention. Used in [Date Conversion Problem](#date-conversion-problem)
+- Luong's Dot Attention. Used in [Date Conversion Problem](#date-conversion-problem)
+- Bahdanau's Attention. Used in [Date Conversion Problem](#date-conversion-problem)
+- Pointer Networks a.k.a. Ptr-Net. Used in [Sorting Numbers](#sorting-numbers)
 
 I've tried, as much as possible, to avoid building custom layers in order to ease the readability of the code. Also, note that the code in `/model` folders contains repeated elements (e.g., `Encoder` is the same for all the models). Again, this is done to ease the readability and portability of the code. Each model is contained in a single folder, so you can simply copy it and it should work for you and your own problem.
 
@@ -15,6 +15,14 @@ Convert dates in different formats (e.g., `"08/30/21"`, `"080120"`, `"AUG 01, 20
 - Input length: 12
 - Output vocabulary size: 13
 - Output length: 10
+
+### Attention Examples
+
+#### Luong Attention
+![image](./media/luong-attention.png)
+
+#### Bahdanau Attention
+![image](./media/bahdanau-attention.png)
 
 ### Running 
 ```bash
@@ -36,6 +44,45 @@ Sorts numbers in an ascending order with Pointer Networks.
 - Output length: 10
 
 > Note: Pointer Networks are capable of dealing with inputs of variable length. However, after using `model.compile()` the model is no longer capable of accepting input sequences of different length. I think the only way of achieving this is by not using `model.compile()` and computing the loss and grads manually. This is a `ToDo`...
+
+### Input Example
+Sorting numbers between 0 and 9. `10` at the first position is the end-of-sequence EOS.
+
+**Encoder Input**
+```bash
+tf.Tensor([[10.  2.  9.  3.  0.  5.  1.  8.  6.  4.  7.]], shape=(1, 11), dtype=float32)
+```
+
+**Decoder Input**
+
+Decoder is fed with the sorted sequence. `11` at the first position is the start-of-sequence SOS.
+```bash
+tf.Tensor([[11.  0.  1.  2.  3.  4.  5.  6.  7.  8.  9.]], shape=(1, 11), dtype=float32)
+```
+
+**Decoder Expected Output**
+
+One hot encoding where each row represents represents a time-step and the location to which the `pointer` should point. The last row should point to the first position of encoder's input, which is the EOS symbol.
+
+```bash
+tf.Tensor(
+[[[0 0 0 0 1 0 0 0 0 0 0]
+  [0 0 0 0 0 0 1 0 0 0 0]
+  [0 1 0 0 0 0 0 0 0 0 0]
+  [0 0 0 1 0 0 0 0 0 0 0]
+  [0 0 0 0 0 0 0 0 0 1 0]
+  [0 0 0 0 0 1 0 0 0 0 0]
+  [0 0 0 0 0 0 0 0 1 0 0]
+  [0 0 0 0 0 0 0 0 0 0 1]
+  [0 0 0 0 0 0 0 1 0 0 0]
+  [0 0 1 0 0 0 0 0 0 0 0]
+  [1 0 0 0 0 0 0 0 0 0 0]]], shape=(1, 11, 11), dtype=int32)
+```
+
+### Attention Examples
+
+#### Pointer Attention
+![image](./media/pointer-attention.png)
 
 ### Running 
 ```bash
