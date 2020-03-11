@@ -220,7 +220,7 @@ Interesting behavior happens at `step 1` and `step 2` and the numbers `18` and `
 
 #### Pointer with Mask
 
-Looking at `step 1` and `step 2` and the numbers `10` and `11` is is possible to see that at `step 1` the networking is unsure between the two numbers but it selects the number `10`. However, contrary to [Pointer Nets without masking](#pointer-attention), at `step 2` the network doesn't even consider the possibility of pointing to the number `10` because it was already selected at `step 1`.
+Looking at `step 1` and `step 2` and the numbers `10` and `11` is is possible to see that at `step 1` the networking is unsure between the two numbers but it selects the number `10`. However, contrary to [Pointer Nets without masking](#vanilla-pointer-network), at `step 2` the network doesn't even consider the possibility of pointing to the number `10` because it was already selected at `step 1`.
 
 **Pointers with Mask**
 
