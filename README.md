@@ -84,9 +84,15 @@ tf.Tensor(
 ### Attention Examples
 
 #### Pointer Attention
-Interesting behavior happens at `step 1` and `step 2`. It shows that at these steps the networks is not sure where to point (either to `18` or `19`) because these number are close to each other. However, at `step 1` it gives more "attention" to the number `18` so it is selected (correct choice).
+Interesting behavior happens at `step 1` and `step 2` and the numbers `18` and `19`. It shows that at these steps the network is not sure where to point (either to `18` or `19`) because these numbers are close to each other. However, at `step 1` it gives more "attention" to the number `18` so it is selected (correct choice). The downside of vanilla pointer networks can be seen at `step 2`. Number `18` was selected at `step 1` but the network still considers it as a valid option at `step 2`. In this problem in particular, the pointer shouldn't point two times at the same place. This can be solved with masking, i.e., after selecting an element at `step t` it should be masked out in a way that the network ignores it at the next step `step t+1`.
 
 ![image](./media/pointer-attention.png)
+
+#### Pointer Attention with Mask
+
+Looking closely at `step 1` and `step 2` and the numbers `10` and `11` we can see that at `step 1` the networking is unsure between the two numbers but it selects the number `11`. However, contrary to [Pointer Nets without masking](#pointer-attention), at `step 2` the network doesn't even consider the possibility of pointing to the number `10` because it was already selected at `step 1`.
+
+![image](./media/pointer-masking.png)
 
 ### Running 
 ```bash

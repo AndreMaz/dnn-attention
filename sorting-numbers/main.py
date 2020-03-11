@@ -21,7 +21,7 @@ num_sample_validation = 50_000
 sample_length = 10
 
 # Upper bound (range.random()) to generate a number
-max_value = 50
+max_value = 100
 
 vocab_size = max_value + 2 # +2 for SOS and EOS
 input_length = sample_length + 1 # For special chars at the beggining of input
@@ -40,7 +40,7 @@ def main() -> None:
         modelName = sys.argv[1]
     except:
         # Use pointer by default
-        modelName = 'pointer'
+        modelName = 'pointer-masking'
 
     # Create model
     model = model_factory(modelName, vocab_size, input_length, embedding_dims, lstm_units)
@@ -100,7 +100,7 @@ def main() -> None:
 
 
 def plotAttention(attention_weights, inputEntry):
-    print(attention_weights[0].shape)
+    # print(attention_weights[0].shape)
     plt.matshow(attention_weights[0])
     
 
@@ -110,11 +110,6 @@ def plotAttention(attention_weights, inputEntry):
     yTicksNames = []
     for i in range(inputLength):
         yTicksNames.append(f"step {i}")
-
-    # outputChars = list(outputStr)
-    # outputLength = len(outputChars)
-    # diffOutput = OUTPUT_LENGTH - outputLength
-    # yTicksNames = outputChars + [' '] * diffOutput
 
     plt.yticks(range(inputLength), yTicksNames)
     
