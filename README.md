@@ -6,7 +6,7 @@ This repo contains implementation of:
 - Pointer Networks a.k.a. Ptr-Net. Used in [Sorting Numbers](#sorting-numbers)
 - Pointer Networks with Masking. Used in [Sorting Numbers](#sorting-numbers)
 
-I've tried, as much as possible, to avoid building custom layers in order to ease the readability of the code. Also, note that the code in `/model` folder contains repeated elements (e.g., `Encoder` is almost the same for all the models). I've deliberately didn't create generic layers because I think that this will ease the readability of the code and help to understand how the data flows through the layers.
+I've tried, as much as possible, to avoid building custom layers in order to ease the readability of the code. Also, note that I've deliberately didn't create generic layers. This means that the code in `/model` folder contains repeated elements (e.g., `Encoder` is almost the same for all the models). However, I think that this way of structuring things will ease the readability of the code and help to understand how the data flows through the layers.
 
 ## Date Conversion Problem
 Convert dates in different formats (e.g., `"08/30/21"`, `"080120"`, `"AUG 01, 2020"`) into ISO standard (e.g., `"2021-08-30"`, `"2020-08-01"`) format. For more info check the [useful links section](#useful-links).

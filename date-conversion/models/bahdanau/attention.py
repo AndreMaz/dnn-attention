@@ -23,7 +23,6 @@ class BahdanauAttention(Layer):
         self.W1(decoder_prev_hidden_with_time_dim) + self.W2(enc_outputs)))
 
     # Apply softmax
-    # attention_weights = tf.nn.softmax(score, axis=1)
     attention_weights = self.attention(score)
 
     context_vector = attention_weights * enc_outputs
