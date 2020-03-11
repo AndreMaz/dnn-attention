@@ -6,10 +6,10 @@ This repo contains implementation of:
 - Pointer Networks a.k.a. Ptr-Net. Used in [Sorting Numbers](#sorting-numbers)
 - Pointer Networks with Masking. Used in [Sorting Numbers](#sorting-numbers)
 
-I've tried, as much as possible, to avoid building custom layers in order to ease the readability of the code. Also, note that the code in `/model` folders contains repeated elements (e.g., `Encoder` is the same for all the models). Again, this is done to ease the readability and portability of the code. Each model is contained in a single folder, so (in theory) you can simply copy it and it should work for you and your own problem.
+I've tried, as much as possible, to avoid building custom layers in order to ease the readability of the code. Also, note that the code in `/model` folder contains repeated elements (e.g., `Encoder` is almost the same for all the models). I've deliberately didn't create generic layers because I think that this will ease the readability of the code and help to understand how the data flows through the layers.
 
 ## Date Conversion Problem
-Convert dates in different formats (e.g., `"08/30/21"`, `"080120"`, `"AUG 01, 2020"`) into ISO standard (e.g., `"2021-08-30"`, `"2020-08-01"`) format. For more info check the [Useful Links Section](#useful-links).
+Convert dates in different formats (e.g., `"08/30/21"`, `"080120"`, `"AUG 01, 2020"`) into ISO standard (e.g., `"2021-08-30"`, `"2020-08-01"`) format. For more info check the [useful links section](#useful-links).
 
 ### Problem Stats
 - Input vocabulary size: 35
@@ -104,22 +104,22 @@ Number input formats: 20
 
 **Encoder's input example for `01.10.2019`**
 ```bash
-Tensor
-     [[1, 2, 13, 2, 1, 13, 3, 1, 2, 10, 0, 0],]
+Tensor(
+     [[1, 2, 13, 2, 1, 13, 3, 1, 2, 10, 0, 0],], shape=(1, 12))
 ```
 
 **Decoder's input example for `2019-10-01`**
 
-Decoder is fed with the sorted sequence a.k.a [teacher forcing](https://machinelearningmastery.com/teacher-forcing-for-recurrent-neural-networks/). The number `1` at the first position is the start-of-sequence (SOS).
+Decoder is fed with the encoded ISO date a.k.a [teacher forcing](https://machinelearningmastery.com/teacher-forcing-for-recurrent-neural-networks/). The number `1` at the first position is the start-of-sequence (SOS).
 
 ```bash
-Tensor
-     [[1, 4, 2, 3, 11, 12, 3, 2, 12, 2],]
+Tensor(
+     [[1, 4, 2, 3, 11, 12, 3, 2, 12, 2],], shape=(1, 10))
 ```
 
 **Decoder's expected output example for `2019-10-01`**
 
-Shape is [10, 13]. 10 is the input length and 13 is the output vocabulary size.
+Shape is [10, 13]. 10 is the output length and 13 is the output vocabulary size.
 
 ```bash
 Tensor(
@@ -132,15 +132,19 @@ Tensor(
       [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
       [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], shape=(1, 10, 13), dtype=int32)
+      [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]]], shape=(1, 10, 13))
 ```
 
-### Attention Examples
+### Attention Plots
 
-#### Luong Attention
+#### Luong Attention 
+
+Input: `NOV 01, 98` Output: `1998-11-01`
+
 ![image](./media/luong-attention.png)
 
 #### Bahdanau Attention
+Input: `APR 04. 1953` Output: `1953-04-04`
 ![image](./media/bahdanau-attention.png)
 
 ### Running 
@@ -156,7 +160,7 @@ python date-conversion/tests/runner.py
 ```
 
 ## Sorting Numbers
-Sorts numbers in an ascending order with Pointer Networks. For more info check the [Useful Links Section](#useful-links).
+Sorts numbers in an ascending order with Pointer Networks. For more info check the [useful links section](#useful-links).
 
 ### Problem Stats
 - Input vocabulary size: 100
@@ -202,18 +206,24 @@ tf.Tensor(
   [1 0 0 0 0 0 0 0 0 0 0]]], shape=(1, 11, 11), dtype=int32)
 ```
 
-### Attention Examples
+### Pointers Plots
 
-#### Pointer Attention
+#### Vanilla Pointer Network
 Interesting behavior happens at `step 1` and `step 2` and the numbers `18` and `19`. It shows that at these steps the network is not sure where to point (either to `18` or `19`) because these numbers are close to each other. However, at `step 1` it gives more "attention" to the number `18` so it is selected (correct choice). The downside of vanilla pointer networks can be seen at `step 2`. Number `18` was selected at `step 1` but the network still considers it as a valid option at `step 2`. In this problem in particular, the pointer shouldn't point two times at the same place. This can be solved with masking, i.e., after selecting an element at `step t` it should be masked out in a way that the network ignores it at the next step `step t+1`.
 
+**Vanilla Pointers**
+
 ![image](./media/pointer-attention.png)
+> Note that in this plot number `50` represents the EOS
 
-#### Pointer Attention with Mask
+#### Pointer with Mask
 
-Looking closely at `step 1` and `step 2` and the numbers `10` and `11` we can see that at `step 1` the networking is unsure between the two numbers but it selects the number `10`. However, contrary to [Pointer Nets without masking](#pointer-attention), at `step 2` the network doesn't even consider the possibility of pointing to the number `10` because it was already selected at `step 1`.
+Looking at `step 1` and `step 2` and the numbers `10` and `11` is is possible to see that at `step 1` the networking is unsure between the two numbers but it selects the number `10`. However, contrary to [Pointer Nets without masking](#pointer-attention), at `step 2` the network doesn't even consider the possibility of pointing to the number `10` because it was already selected at `step 1`.
+
+**Pointers with Mask**
 
 ![image](./media/pointer-masking.png)
+> Note that in this plot number `100` represents the EOS
 
 ### Running 
 ```bash
