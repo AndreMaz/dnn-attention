@@ -46,7 +46,7 @@ Sorts numbers in an ascending order with Pointer Networks.
 > Note: Pointer Networks are capable of dealing with inputs of variable length. However, after using `model.compile()` the model is no longer capable of accepting input sequences of different length. I think the only way of achieving this is by not using `model.compile()` and computing the loss and grads manually. This is a `ToDo`...
 
 ### Input Example
-Sorting numbers between 0 and 9. `10` at the first position is the end-of-sequence EOS.
+Sorting numbers between 0 and 9. The number `10` at the first position is the end-of-sequence (EOS).
 
 **Encoder Input**
 ```bash
@@ -55,7 +55,8 @@ tf.Tensor([[10.  2.  9.  3.  0.  5.  1.  8.  6.  4.  7.]], shape=(1, 11), dtype=
 
 **Decoder Input**
 
-Decoder is fed with the sorted sequence. `11` at the first position is the start-of-sequence SOS.
+Decoder is fed with the sorted sequence a.k.a [teacher forcing](https://machinelearningmastery.com/teacher-forcing-for-recurrent-neural-networks/). The number `11` at the first position is the start-of-sequence (SOS).
+
 ```bash
 tf.Tensor([[11.  0.  1.  2.  3.  4.  5.  6.  7.  8.  9.]], shape=(1, 11), dtype=float32)
 ```
@@ -82,6 +83,8 @@ tf.Tensor(
 ### Attention Examples
 
 #### Pointer Attention
+Interesting behavior happens at `step 1` and `step 2`. It shows that at these steps the networks is not sure where to point (either to `18` or `19`) because these number are close to each other. However, at `step 1` it gives more "attention" to the number `18` so it is selected (correct choice).
+
 ![image](./media/pointer-attention.png)
 
 ### Running 
