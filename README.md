@@ -232,9 +232,9 @@ python sorting-numbers/main.py <model-name> # One of "pointer" or "pointer-maski
 
 ## Useful Links
 A short list of links that I've found useful while I was learning about attention mechanisms:
-- Tensorflow.js [data-conversion-attention](https://github.com/tensorflow/tfjs-examples/tree/master/date-conversion-attention) example. I've simply ported the dataset generation script and Luong's attention (slightly refactored). Nevertheless, All the credit goes to the TF team and the people that built the model.
-- [Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/pdf/1409.0473.pdf)
-- [Effective Approaches to Attention-based Neural Machine Translation](https://arxiv.org/abs/1508.04025)
+- Tensorflow.js [data-conversion-attention](https://github.com/tensorflow/tfjs-examples/tree/master/date-conversion-attention) example. I've simply ported the dataset generation script and Luong's attention (slightly refactored). Nevertheless, all the credit goes to the TF team and the people that built the model.
+- [Neural Machine Translation by Jointly Learning to Align and Translate](https://arxiv.org/pdf/1409.0473.pdf) - Bahdanau's attention
+- [Effective Approaches to Attention-based Neural Machine Translation](https://arxiv.org/abs/1508.04025) - Luong's Attention
 - [Pointer Networks](https://arxiv.org/abs/1506.03134)
 - [Neural machine translation with attention](https://www.tensorflow.org/tutorials/text/nmt_with_attention)
 - [Attention Mechanism](https://blog.floydhub.com/attention-mechanism/)

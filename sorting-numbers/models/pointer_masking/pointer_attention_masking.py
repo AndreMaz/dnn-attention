@@ -24,38 +24,40 @@ class PointerAttentionMasking(Layer):
     steps = tf.unstack(dec_outputs, axis=1)
     pointerList = []
 
-    
-    # maskSize = len(steps)
-    
+    # Create mask with 0s because at this point there no pointers were created
+    # Initially the pointer can point at any position of the input
     mask = tf.zeros_like(dec_input)
 
     # Iterate over time steps and compute the pointers
     for _, currentStep in enumerate(steps):
       # decoder_prev_hidden shape is [batch_size, features]
       # enc_output shape is [batch_size, timesteps, features]
-      # To performs ops between them we need to reshape the decoder_prev_hidden into [batch_size, 1, features]
+      # To perform ops between them we need to reshape the decoder_prev_hidden into [batch_size, 1, features]
       decoder_prev_hidden_with_time_dim = tf.expand_dims(currentStep, 1)
 
-      # score shape == (batch_size, max_length, 1)
+      # score shape [batch_size, max_length, 1]
       # we get 1 at the last axis because we are applying score to self.V
-      # the shape of the tensor before applying self.V is (batch_size, max_length, units)
       score = self.V(tf.nn.tanh(
           self.W1(decoder_prev_hidden_with_time_dim) + self.W2(enc_outputs)))
 
-      # Remove last dim
+      # Remove last dim. Score shape will be [batch_size, max_length]
       score = tf.squeeze(score, axis=2)
 
-      # Apply mask
+      # Apply mask my subtracting a big number from the score
+      # Doing this will make make indexes that were previously selected (pointed) extremely improbable to select again
       score -= mask * self.BIG_NUMBER
 
       # Apply softmax
       attention_pointer = self.attention(score)
       
+      # Get the indices to were the pointers point to
       elemToMask = tf.math.argmax(attention_pointer, axis=1)
+      # Convert the positions to one-hot encoding
+      # One-hot encoding represents the element that was selected (pointed)
       elemToMask = tf.one_hot(elemToMask, self.input_length)
 
+      # Update the mask by adding the one-hot
       mask = mask + elemToMask
-      
 
       # Store the pointer
       pointerList.append(attention_pointer)

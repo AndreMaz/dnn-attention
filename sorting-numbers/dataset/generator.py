@@ -13,7 +13,7 @@ def generateDataset(num_samples, sample_length, max_value, vocab_size):
 
     # Generate sequence of possible numbers
     num_sequence = []
-    for i in range(max_value): # +1 to include the upper limit 
+    for i in range(max_value):
         num_sequence.append(i)
 
     for _ in range(num_samples):
@@ -23,7 +23,7 @@ def generateDataset(num_samples, sample_length, max_value, vocab_size):
         # Get a slice of shuffled numbers and add EOS_CODE
         enc_input_list = [EOS_CODE] + list(num_sequence[:sample_length])
 
-        # Decoder's input is equal to the sorted encoder's input BUT:
+        # Decoder's input is equal to the encoder's input BUT:
         # - it's sorted
         # - it has a START_CODE at the beggining
         dec_input_list = list(enc_input_list[1:])
@@ -52,4 +52,3 @@ def generateDataset(num_samples, sample_length, max_value, vocab_size):
         decoderOutputs.append(dec_out_enc)
 
     return tf.convert_to_tensor(encoderInputs), tf.convert_to_tensor(decoderInputs), tf.convert_to_tensor(decoderOutputs)
-    # return 1
