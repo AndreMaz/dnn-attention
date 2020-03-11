@@ -3,7 +3,6 @@ sys.path.append(".")
 from dataset.date_format import encodeInputDateStrings, OUTPUT_LENGTH, START_CODE, OUTPUT_VOCAB
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.models import Model
 
 def runSeq2SeqInference(model, inputStr):
     # Encode encoder's input date
@@ -16,26 +15,15 @@ def runSeq2SeqInference(model, inputStr):
 
     for i in range(1, OUTPUT_LENGTH):
         # Make a predition
-        predictOut = model.predict([encoderInput, decoderInput])
+        predictOut, _ = model.predict([encoderInput, decoderInput])
         # Get the result
         output = predictOut.argmax(2)[0, i-1]
         # Append it to the decoder's input
         decoderInput[0, i] = output
 
     # Make the prediction of the last char
-    # finalPredictOut = model.predict([encoderInput, decoderInput])
-    # decoderFinalOutput = finalPredictOut.argmax(2)[0, OUTPUT_LENGTH-1]
-
-    # Make new model that will also return the attention weights
-    finalStepModel = Model(
-        inputs = model.input,
-        outputs = [model.output, model.get_layer('decoder').output[1]]
-    )
-
-    # Make the prediction of the last char
-    finalPredictOut, attention_weights = finalStepModel.predict([encoderInput, decoderInput])
+    finalPredictOut, attention_weights = model.predict([encoderInput, decoderInput])
     decoderFinalOutput = finalPredictOut.argmax(2)[0, OUTPUT_LENGTH-1]
-
 
     # Map the indices to chars
     outputStr = ""

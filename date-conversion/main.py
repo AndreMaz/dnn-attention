@@ -3,6 +3,7 @@ from dataset.date_format import INPUT_VOCAB, OUTPUT_VOCAB, INPUT_LENGTH, OUTPUT_
 from dataset import generator
 from models.inference import runSeq2SeqInference
 from models.model_factory import model_factory
+from tensorflow.keras.models import Model
 
 from datetime import datetime
 from tensorflow import keras
@@ -12,7 +13,7 @@ import sys
 import matplotlib.pyplot as plt
 
 minYear = '1950-01-01'
-maxYear = '1955-01-01'
+maxYear = '2050-01-01'
 
 embeddingDims = 64
 lstmUnits = 64
@@ -40,6 +41,7 @@ def main(minYear: str, maxYear: str) -> None:
     logdir = "logs/scalars/" + datetime.now().strftime("%Y%m%d-%H%M%S")
     tensorboard_callback = keras.callbacks.TensorBoard(log_dir=logdir)
 
+    # Run training and validation
     model.fit(
         x=[trainEncoderInput, trainDecoderInput],
         y=trainDecoderOutput,
@@ -51,7 +53,14 @@ def main(minYear: str, maxYear: str) -> None:
     )
 
     # Test the model
-    
+    # Make new model that will also return the attention weights
+    # It will produce two outputs: the actual prediction and the attention weights
+    model = Model(
+        inputs = model.input,
+        # Add attention_weights to the output list
+        outputs = [model.output, model.get_layer('decoder').output[1]]
+    )
+
     numTests = 10
     for n in range(numTests):
         for _, fn in enumerate(INPUT_FNS):
@@ -65,7 +74,7 @@ def main(minYear: str, maxYear: str) -> None:
             print(f"Correct Answer: {correctAnswer}")
             # Run the inference
             outputStr, attention_weights = runSeq2SeqInference(model, inputStr)
-            plotAttention(attention_weights, inputStr, outputStr, INPUT_LENGTH, OUTPUT_LENGTH)
+            # plotAttention(attention_weights, inputStr, outputStr, INPUT_LENGTH, OUTPUT_LENGTH)
 
             print(f"Predicted Answer: {outputStr}")
             if (outputStr == correctAnswer):
