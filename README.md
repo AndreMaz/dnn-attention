@@ -170,7 +170,7 @@ Sorts numbers in an ascending order with Pointer Networks. For more info check t
 - Output vocabulary size: 100
 - Output length: 10
 
-> Note: Pointer Networks are capable of dealing with inputs of variable length. However, after using `model.compile()` the model is no longer capable of accepting input sequences of different length. I think the only way of achieving this is by not using `model.compile()` and computing the loss and grads manually. This is a `ToDo`...
+> Note: Pointer Networks are capable of dealing with inputs of variable length. For example, we can train the model with sequence size equal to 10 but during testing we can feed sequences larger than 10 and it will still be able to sort it. However, after using `model.compile()` the model becomes "static" and it no longer accepts input sequences of variable length. I think the only way of solving this is by not using `model.compile()` and do the training (computing the loss and gradients) manually. This is a `ToDo`...
 
 ### Input/Output Example
 
