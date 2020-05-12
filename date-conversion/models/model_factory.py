@@ -12,10 +12,9 @@ def model_factory(name, input_vocab_size, output_vocab_size, input_length, outpu
     try:
         createModel = models[name]
         print(f'Using "{name.upper()}" model')
+        return createModel(input_vocab_size, output_vocab_size, input_length, output_length, embedding_dims, lstm_units)
     except:
         raise NameError('Unknown Model Name! Select one of: "seq2seq", "luong" or "bahdanau"')
-    
-    return createModel(input_vocab_size, output_vocab_size, input_length, output_length, embedding_dims, lstm_units)
 
 
 if __name__ == "__main__":

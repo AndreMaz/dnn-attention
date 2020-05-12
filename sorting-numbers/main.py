@@ -15,7 +15,7 @@ embedding_dims = 64
 lstm_units = 64
 
 # Training and validations size
-num_samples_training = 5000
+num_samples_training = 50000
 num_sample_validation = 5000
 
 # Length of input sequence
@@ -54,7 +54,7 @@ def main(plotAttention = False) -> None:
     model.fit(
         x=[trainEncoderInput, trainDecoderInput],
         y=trainDecoderOutput,
-        epochs=3,
+        epochs=5,
         batch_size=128,
         shuffle=True,
         validation_data=([valEncoderInput, valDecoderInput], valDecoderOutput),
