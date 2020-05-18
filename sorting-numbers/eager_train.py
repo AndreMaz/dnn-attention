@@ -1,7 +1,7 @@
 # from dataset.dataset_generator import ArtificialDataset
 from dataset.generator import generateDataset
-from models.model_factory import model_factory
-from models.inference import runSeq2SeqInference
+from models.eager_pointer.model import EagerModel
+from models.eager_inference import runSeq2SeqInference
 import tensorflow as tf
 import numpy as np
 import sys
@@ -9,16 +9,18 @@ import sys
 # For plotting
 import matplotlib.pyplot as plt
 
-num_epochs = 5
+num_epochs = 10
 batch_size = 128
+
 # Embedding dims to represent a number
 embedding_dims = 64
 # Output dimensionality of LSTM
 lstm_units = 64
 
 # Training and validations size
-num_samples_training = 50000
-num_sample_validation = 5000
+num_samples_training = 49920
+# num_samples_training = 256
+num_sample_validation = 5
 
 # Length of input sequence
 sample_length = 10
@@ -30,38 +32,51 @@ vocab_size = max_value + 2  # +2 for SOS and EOS
 input_length = sample_length + 1  # For special chars at the beggining of input
 
 
-def main(plotAttention = False) -> None:
+def main(plotAttention=False) -> None:
     print('Generating Dataset')
     # generate training dataset
     trainEncoderInput, trainDecoderInput, trainDecoderOutput = generateDataset(
         num_samples_training, sample_length, max_value, vocab_size)
 
     # generate validation dataset
-    valEncoderInput, valDecoderInput, valDecoderOutput = generateDataset(
-        num_sample_validation, sample_length, max_value, vocab_size)
+    # valEncoderInput, valDecoderInput, valDecoderOutput = generateDataset(
+    #    num_sample_validation, sample_length, max_value, vocab_size)
     print('Dataset Generated!')
 
-    # Get model name
-    try:
-        modelName = sys.argv[1]
-    except:
-        # Use pointer by default
-        modelName = 'pointer-masking'
+    loss_fn = tf.losses.CategoricalCrossentropy()
+    optimizer = tf.optimizers.Adam()
 
-    # Create model
-    model = model_factory(modelName, vocab_size,
-                          input_length, embedding_dims, lstm_units)
-    model.summary(line_length=180)
+    model = EagerModel(vocab_size, embedding_dims, lstm_units)
 
-    model.fit(
-        x=[trainEncoderInput, trainDecoderInput],
-        y=trainDecoderOutput,
-        epochs=num_epochs,
-        batch_size=batch_size,
-        shuffle=True,
-        validation_data=([valEncoderInput, valDecoderInput], valDecoderOutput),
-        # callbacks = [tensorboard_callback]
-    )
+    losses = []
+
+    # tf.expand_dims(trainEncoderInput[0], axis=0)
+    # res = model(tf.expand_dims(trainEncoderInput[0], axis=0), tf.expand_dims(trainDecoderInput[0], axis=0))
+    num_batches = int(num_samples_training / batch_size)
+    for epoch in range(num_epochs):
+        loss_per_epoch = []
+        for i in range(num_batches - 1):
+            enc_in_batch = trainEncoderInput[i * batch_size: (i+1) * batch_size]
+            dec_in_batch = trainDecoderInput[i * batch_size: (i+1) * batch_size]
+            dec_out_batch = trainDecoderOutput[i * batch_size: (i+1) * batch_size]
+
+            # print(f"From {i * batch_size} to {(i+1) * batch_size}")
+
+            with tf.GradientTape() as tape:
+                predicted = model(enc_in_batch, dec_in_batch)
+                loss = loss_fn(dec_out_batch, predicted)
+                # Store the loss
+                loss_per_epoch.append(loss)
+
+            grads = tape.gradient(loss, model.trainable_variables)
+
+            optimizer.apply_gradients(zip(grads, model.trainable_variables))
+        
+        arr = np.asarray(loss_per_epoch)
+        print(f"Epoch: {epoch} avg. loss: {arr.mean()}")
+        losses.append(loss_per_epoch)
+
+    print(losses)
 
     # Test the model
     num_samples_tests = 200
@@ -129,7 +144,6 @@ def plotAttention(attention_weights, inputEntry):
     plt.xlabel('Input Sequence')
 
     plt.show(block=True)
-
 
 if __name__ == "__main__":
     main()
