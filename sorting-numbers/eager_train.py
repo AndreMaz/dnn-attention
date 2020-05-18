@@ -1,6 +1,6 @@
 # from dataset.dataset_generator import ArtificialDataset
 from dataset.generator import generateDataset
-from models.eager_pointer.model import EagerModel
+from models.eager_pointer_no_teacher.model import EagerModel
 from models.eager_inference import runSeq2SeqInference
 import tensorflow as tf
 import numpy as np
@@ -18,9 +18,7 @@ embedding_dims = 64
 lstm_units = 64
 
 # Training and validations size
-# num_samples_training = 49920
-num_samples_training = 256
-num_sample_validation = 5
+num_samples_training = 49920
 
 # Length of input sequence
 sample_length = 10
@@ -28,7 +26,7 @@ sample_length = 10
 # Upper bound (range.random()) to generate a number
 max_value = 100
 
-vocab_size = max_value + 2  # +2 for SOS and EOS
+vocab_size = max_value + 3  # +3 for MASK, SOS and EOS
 input_length = sample_length + 1  # For special chars at the beggining of input
 
 
@@ -37,10 +35,6 @@ def main(plotAttention=False) -> None:
     # generate training dataset
     trainEncoderInput, trainDecoderInput, trainDecoderOutput = generateDataset(
         num_samples_training, sample_length, max_value, vocab_size)
-
-    # generate validation dataset
-    # valEncoderInput, valDecoderInput, valDecoderOutput = generateDataset(
-    #    num_sample_validation, sample_length, max_value, vocab_size)
     print('Dataset Generated!')
 
     loss_fn = tf.losses.CategoricalCrossentropy()
@@ -57,11 +51,11 @@ def main(plotAttention=False) -> None:
         loss_per_epoch = []
         for i in range(num_batches - 1):
             enc_in_batch = trainEncoderInput[i * batch_size: (i+1) * batch_size]
-            dec_in_batch = trainDecoderInput[i * batch_size: (i+1) * batch_size]
+            # dec_in_batch = trainDecoderInput[i * batch_size: (i+1) * batch_size]
             dec_out_batch = trainDecoderOutput[i * batch_size: (i+1) * batch_size]
 
             with tf.GradientTape() as tape:
-                predicted = model(enc_in_batch, dec_in_batch)
+                predicted = model(enc_in_batch)
                 loss = loss_fn(dec_out_batch, predicted)
                 # Store the loss
                 loss_per_epoch.append(loss)

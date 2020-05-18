@@ -1,8 +1,9 @@
-import tensorflow as tf
-from models.pointer_network.pointer_attention import PointerAttention
+# import tensorflow as tf
+from models.eager_pointer.pointer_attention import PointerAttention
+from tensorflow.keras.layers import Embedding, LSTM, Layer
 
 
-class Decoder(tf.keras.Model):
+class Decoder(Layer):
     def __init__(self, vocab_size, embedding_dim, dec_units):
         super(Decoder, self).__init__()
 
@@ -10,10 +11,9 @@ class Decoder(tf.keras.Model):
         self.dec_units = dec_units
         self.vocab_size = vocab_size
 
-        self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_dim, mask_zero=True)
+        self.embedding = Embedding(vocab_size, embedding_dim)
 
-        self.lstm = tf.keras.layers.LSTM(self.dec_units,
-                       return_sequences=True)
+        self.lstm = LSTM(self.dec_units, return_sequences=True)
 
         # Attention Layers
         self.attention = PointerAttention(self.dec_units, self.vocab_size)

@@ -11,7 +11,7 @@ class Decoder(tf.keras.Model):
         self.vocab_size = vocab_size
         self.input_length = input_length
 
-        self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_dim)
+        self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_dim, mask_zero=True)
 
         self.lstm = tf.keras.layers.LSTM(self.dec_units,
                        return_sequences=True)

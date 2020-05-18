@@ -11,7 +11,7 @@ class Decoder(Layer):
         self.dec_units = dec_units
         self.vocab_size = vocab_size
 
-        self.embedding = Embedding(vocab_size, embedding_dim)
+        self.embedding = Embedding(vocab_size, embedding_dim, mask_zero=True)
 
         self.lstm = LSTM(self.dec_units, return_sequences=True)
 

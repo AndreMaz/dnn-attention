@@ -6,7 +6,7 @@ class Encoder(Model):
     def __init__(self, vocab_size, embedding_dim, enc_units):
         super(Encoder, self).__init__()
         self.enc_units = enc_units
-        self.embedding = Embedding(vocab_size, embedding_dim)
+        self.embedding = Embedding(vocab_size, embedding_dim, mask_zero=True)
         self.lstm = LSTM(self.enc_units,
                        return_sequences=True,
                        return_state=True)

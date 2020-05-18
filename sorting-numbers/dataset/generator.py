@@ -4,8 +4,8 @@ import random
 
 def generateDataset(num_samples, sample_length, max_value, vocab_size):
     min_value = 1
-    EOS_CODE = max_value + 0 # max_value is not included in range(max_value)
-    SOS_CODE = max_value + 1 # next element
+    EOS_CODE = max_value + 1 # max_value is not included in range(max_value)
+    SOS_CODE = max_value + 2 # next element
     
     encoderInputs = []
     decoderInputs = []
@@ -13,7 +13,7 @@ def generateDataset(num_samples, sample_length, max_value, vocab_size):
 
     # Generate sequence of possible numbers
     num_sequence = []
-    for i in range(max_value):
+    for i in range(min_value, max_value + 1):
         num_sequence.append(i)
 
     for _ in range(num_samples):
