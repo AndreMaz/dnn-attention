@@ -1,8 +1,7 @@
-from tensorflow.keras.layers import Embedding, LSTM
-from tensorflow.keras import Model
+from tensorflow.keras.layers import Embedding, LSTM, Layer
+# from tensorflow.keras import Model
 
-
-class Encoder(Model):
+class Encoder(Layer):
     def __init__(self, vocab_size, embedding_dim, enc_units):
         super(Encoder, self).__init__()
         self.enc_units = enc_units

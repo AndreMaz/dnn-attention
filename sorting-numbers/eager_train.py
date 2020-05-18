@@ -18,8 +18,8 @@ embedding_dims = 64
 lstm_units = 64
 
 # Training and validations size
-num_samples_training = 49920
-# num_samples_training = 256
+# num_samples_training = 49920
+num_samples_training = 256
 num_sample_validation = 5
 
 # Length of input sequence
@@ -60,8 +60,6 @@ def main(plotAttention=False) -> None:
             dec_in_batch = trainDecoderInput[i * batch_size: (i+1) * batch_size]
             dec_out_batch = trainDecoderOutput[i * batch_size: (i+1) * batch_size]
 
-            # print(f"From {i * batch_size} to {(i+1) * batch_size}")
-
             with tf.GradientTape() as tape:
                 predicted = model(enc_in_batch, dec_in_batch)
                 loss = loss_fn(dec_out_batch, predicted)
@@ -72,9 +70,9 @@ def main(plotAttention=False) -> None:
 
             optimizer.apply_gradients(zip(grads, model.trainable_variables))
         
-        arr = np.asarray(loss_per_epoch)
-        print(f"Epoch: {epoch} avg. loss: {arr.mean()}")
-        losses.append(loss_per_epoch)
+        epoch_loss = np.asarray(loss_per_epoch).mean()
+        print(f"Epoch: {epoch} avg. loss: {epoch_loss}")
+        losses.append(epoch_loss)
 
     print(losses)
 
