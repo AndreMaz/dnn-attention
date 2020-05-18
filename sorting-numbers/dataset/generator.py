@@ -51,4 +51,4 @@ def generateDataset(num_samples, sample_length, max_value, vocab_size):
 
         decoderOutputs.append(dec_out_enc)
 
-    return tf.convert_to_tensor(encoderInputs), tf.convert_to_tensor(decoderInputs), tf.convert_to_tensor(decoderOutputs)
+    return tf.convert_to_tensor(encoderInputs), tf.convert_to_tensor(decoderInputs), tf.convert_to_tensor(decoderOutputs), SOS_CODE

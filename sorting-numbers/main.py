@@ -9,7 +9,7 @@ import sys
 # For plotting
 import matplotlib.pyplot as plt
 
-num_epochs = 5
+num_epochs = 10
 batch_size = 128
 # Embedding dims to represent a number
 embedding_dims = 64
@@ -17,7 +17,7 @@ embedding_dims = 64
 lstm_units = 64
 
 # Training and validations size
-num_samples_training = 50000
+num_samples_training = 50_000
 num_sample_validation = 5000
 
 # Length of input sequence
@@ -33,11 +33,11 @@ input_length = sample_length + 1  # For special chars at the beggining of input
 def main(plotAttention = False) -> None:
     print('Generating Dataset')
     # generate training dataset
-    trainEncoderInput, trainDecoderInput, trainDecoderOutput = generateDataset(
+    trainEncoderInput, trainDecoderInput, trainDecoderOutput, _ = generateDataset(
         num_samples_training, sample_length, max_value, vocab_size)
 
     # generate validation dataset
-    valEncoderInput, valDecoderInput, valDecoderOutput = generateDataset(
+    valEncoderInput, valDecoderInput, valDecoderOutput, _ = generateDataset(
         num_sample_validation, sample_length, max_value, vocab_size)
     print('Dataset Generated!')
 
@@ -67,8 +67,7 @@ def main(plotAttention = False) -> None:
     num_samples_tests = 200
     correctPredictions = 0
     wrongPredictions = 0
-    trainEncoderInput, _, _ = generateDataset(
-        num_samples_tests, sample_length, max_value, vocab_size)
+    trainEncoderInput, _, _, _ = generateDataset(num_samples_tests, sample_length, max_value, vocab_size)
     for _, inputEntry in enumerate(trainEncoderInput):
         print('__________________________________________________')
 

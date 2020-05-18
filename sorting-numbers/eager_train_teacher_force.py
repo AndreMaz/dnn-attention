@@ -35,7 +35,7 @@ input_length = sample_length + 1  # For special chars at the beggining of input
 def main(plotAttention=False) -> None:
     print('Generating Dataset')
     # generate training dataset
-    trainEncoderInput, trainDecoderInput, trainDecoderOutput = generateDataset(
+    trainEncoderInput, trainDecoderInput, trainDecoderOutput, _ = generateDataset(
         num_samples_training, sample_length, max_value, vocab_size)
 
     # generate validation dataset
@@ -80,7 +80,7 @@ def main(plotAttention=False) -> None:
     num_samples_tests = 200
     correctPredictions = 0
     wrongPredictions = 0
-    trainEncoderInput, _, _ = generateDataset(
+    trainEncoderInput, _, _, _ = generateDataset(
         num_samples_tests, sample_length, max_value, vocab_size)
     for _, inputEntry in enumerate(trainEncoderInput):
         print('__________________________________________________')
