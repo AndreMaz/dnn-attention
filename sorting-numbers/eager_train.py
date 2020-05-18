@@ -18,7 +18,8 @@ embedding_dims = 64
 lstm_units = 64
 
 # Training and validations size
-num_samples_training = 49920
+# num_samples_training = 49920
+num_samples_training = 2
 
 # Length of input sequence
 sample_length = 10
@@ -40,12 +41,12 @@ def main(plotAttention=False) -> None:
     loss_fn = tf.losses.CategoricalCrossentropy()
     optimizer = tf.optimizers.Adam()
 
-    model = EagerModel(vocab_size, embedding_dims, lstm_units)
+    model = EagerModel(vocab_size, embedding_dims, lstm_units, SOS_CODE)
 
     losses = []
 
-    # tf.expand_dims(trainEncoderInput[0], axis=0)
-    # res = model(tf.expand_dims(trainEncoderInput[0], axis=0), tf.expand_dims(trainDecoderInput[0], axis=0))
+    res = model(trainEncoderInput)
+
     num_batches = int(num_samples_training / batch_size)
     for epoch in range(num_epochs):
         loss_per_epoch = []

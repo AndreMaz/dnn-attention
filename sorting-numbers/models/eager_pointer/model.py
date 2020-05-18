@@ -1,7 +1,7 @@
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
-from models.pointer_network.encoder import Encoder
-from models.pointer_network.decoder import Decoder
+from models.eager_pointer.encoder import Encoder
+from models.eager_pointer.decoder import Decoder
 
 from tensorflow.keras.layers import Embedding, LSTM
 from tensorflow.keras import Model
