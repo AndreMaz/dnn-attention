@@ -9,7 +9,7 @@ import sys
 # For plotting
 import matplotlib.pyplot as plt
 
-num_epochs = 10
+num_epochs = 15
 batch_size = 128
 
 # Embedding dims to represent a number
@@ -50,8 +50,7 @@ def main(plotAttention=False) -> None:
 
     losses = []
 
-    # tf.expand_dims(trainEncoderInput[0], axis=0)
-    # res = model(tf.expand_dims(trainEncoderInput[0], axis=0), tf.expand_dims(trainDecoderInput[0], axis=0))
+    print('Training...')
     num_batches = int(num_samples_training / batch_size)
     for epoch in range(num_epochs):
         loss_per_epoch = []
