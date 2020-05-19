@@ -1,5 +1,5 @@
 # import tensorflow as tf
-from models.eager_pointer.pointer_attention import PointerAttention
+from models.eager_pointer_with_teacher.pointer_attention import PointerAttention
 from tensorflow.keras.layers import Embedding, LSTM, Layer
 
 

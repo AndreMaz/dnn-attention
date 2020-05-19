@@ -1,6 +1,6 @@
 # from dataset.dataset_generator import ArtificialDataset
 from dataset.generator import generateDataset
-from models.eager_pointer.model import EagerModel
+from models.eager_pointer_with_teacher.model import EagerModel
 from models.eager_inference import runSeq2SeqInference
 import tensorflow as tf
 import numpy as np
