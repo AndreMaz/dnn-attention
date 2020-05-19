@@ -2,9 +2,9 @@ import sys
 sys.path.append(".")
 import numpy as np
 
-def runSeq2SeqInference(model, encoderInput, vocab_size, input_length, max_value):
-    EOS_CODE = max_value + 0 # max_value is not included in range(max_value)
-    SOS_CODE = max_value + 1 # next element
+def runSeq2SeqInference(model, encoderInput, vocab_size, input_length, max_value, SOS_CODE, EOS_CODE):
+    # EOS_CODE = max_value + 0 # max_value is not included in range(max_value)
+    # SOS_CODE = max_value + 1 # next element
 
     # Init Decoder's input to zeros
     decoderInput = np.zeros((1, input_length), dtype="float32")

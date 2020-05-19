@@ -22,6 +22,6 @@ class EagerModel(Model):
         encoderHiddenStates, encoderLastHiddenState, encoderLastCarryState = self.encoder(
         encoder_input)
 
-        decoderOutput = self.decoder([encoderLastHiddenState, encoderLastCarryState], encoderHiddenStates)
+        decoderOutput = self.decoder(encoder_input, [encoderLastHiddenState, encoderLastCarryState], encoderHiddenStates)
 
         return decoderOutput

@@ -14,12 +14,17 @@ class Decoder(Layer):
 
         self.embedding = Embedding(vocab_size, embedding_dim)
 
-        self.lstm = LSTM(self.dec_units, return_sequences=True)
+        # self.lstm = LSTM(self.dec_units, return_sequences=True)
 
         # Attention Layers
         self.attention = PointerAttention(self.dec_units, self.vocab_size)
         
-    def call(self, dec_hidden, enc_outputs):
+        # We are going to do the looping manually so instead of LSMT Layer we use LSTM cell
+        self.cell = tf.keras.layers.LSTMCell(
+            self.dec_units, recurrent_initializer='glorot_uniform')
+
+
+    def call(self, encoder_input, dec_hidden, enc_outputs):
         
         # Decoder's input starts with SOS code
         sos_tensor = tf.fill([enc_outputs.shape[0], 1], self.SOS_CODE)
@@ -33,10 +38,28 @@ class Decoder(Layer):
         # Convert input to embeddings
         dec_input = self.embedding(dec_input)
 
-        # Pass through LSTM
-        decoder_outputs = self.lstm(dec_input, initial_state = dec_hidden)
+        prevDecoderHiddenState = dec_hidden[0]
+        prevDecoderCarryState = dec_hidden[1]
 
-        # Compute the pointers
-        pointers = self.attention(decoder_outputs, enc_outputs)
+        perStepInputs = tf.unstack(dec_input, axis=1)
+        perStepOutputs = []
+
+        for _, currentInput in enumerate(perStepInputs):
+            # Pass the data into LSTM cell
+            stepOutput, currentState = self.cell(
+                currentInput, states=[prevDecoderHiddenState, prevDecoderCarryState])
+
+            # Update prev states. They will be used in the next iteration
+            prevDecoderHiddenState = currentState[0]
+            prevDecoderCarryState = currentState[1]
+
+            # Compute the pointers
+            pointer = self.attention(stepOutput, enc_outputs)
+
+            # Update decoder's input
+            pointed_values = pointer.numpy().argmax(axis=1)
+
+            perStepOutputs.append(pointer)
         
-        return pointers
+        # return pointers
+        return perStepOutputs

@@ -34,7 +34,7 @@ input_length = sample_length + 1  # For special chars at the beggining of input
 def main(plotAttention=False) -> None:
     print('Generating Dataset')
     # generate training dataset
-    trainEncoderInput, trainDecoderInput, trainDecoderOutput, SOS_CODE = generateDataset(
+    trainEncoderInput, trainDecoderInput, trainDecoderOutput, SOS_CODE, EOS_CODE = generateDataset(
         num_samples_training, sample_length, max_value, vocab_size)
     print('Dataset Generated!')
 
@@ -75,7 +75,7 @@ def main(plotAttention=False) -> None:
     num_samples_tests = 200
     correctPredictions = 0
     wrongPredictions = 0
-    trainEncoderInput, _, _, _ = generateDataset(
+    trainEncoderInput, _, _, SOS_CODE, EOS_CODE = generateDataset(
         num_samples_tests, sample_length, max_value, vocab_size)
     for _, inputEntry in enumerate(trainEncoderInput):
         print('__________________________________________________')
@@ -95,7 +95,7 @@ def main(plotAttention=False) -> None:
 
         # Run the inference and generate predicted output
         predictedAnswer, attention_weights = runSeq2SeqInference(
-            model, inputEntry, vocab_size, input_length, max_value)
+            model, inputEntry, vocab_size, input_length, max_value, SOS_CODE, EOS_CODE)
         if (plotAttention == True):
             plotAttention(attention_weights, inputEntry)
         print(predictedAnswer)
