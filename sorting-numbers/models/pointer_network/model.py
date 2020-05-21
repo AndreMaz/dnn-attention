@@ -50,3 +50,21 @@ class EagerModel(Model):
                             encoderLastHiddenState, encoderLastCarryState], encoderHiddenStates)
 
         return decoderOutput
+
+class EagerModelNoTrainer(Model):
+    def __init__(self, vocab_size, embedding_dim, lstm_units):
+        super(EagerModelNoTrainer, self).__init__()
+        self.vocab_size = vocab_size
+        self.embedding_dim = embedding_dim
+        self.lstm_units = lstm_units
+
+        self.encoder = Encoder(self.vocab_size, self.embedding_dim, self.lstm_units)
+        self.decoder = Decoder(self.vocab_size, self.embedding_dim, self.lstm_units)
+
+    def call(self, encoder_input):
+        encoderHiddenStates, encoderLastHiddenState, encoderLastCarryState = self.encoder(
+        encoder_input)
+
+        decoderOutput = self.decoder([encoderLastHiddenState, encoderLastCarryState], encoderHiddenStates)
+
+        return decoderOutput

@@ -3,16 +3,15 @@ from dataset.generator import generateDataset
 from models.pointer_network.model import EagerModel
 from models.inference import runSeq2SeqInference
 from utils.read_configs import get_configs
+from utils.tester import tester
+
 import tensorflow as tf
 import numpy as np
 import sys
 
-# For plotting
-# import matplotlib.pyplot as plt
-from utils.tester import tester
 
 def main(plotAttention=False) -> None:
-# Get the configs
+    # Get the configs
     configs = get_configs(sys.argv)
 
     print('Generating Dataset')
@@ -33,10 +32,10 @@ def main(plotAttention=False) -> None:
     optimizer = tf.optimizers.Adam()
 
     model = EagerModel(
-        configs['vocab_size'], 
-        configs['embedding_dims'], 
+        configs['vocab_size'],
+        configs['embedding_dims'],
         configs['lstm_units']
-        )
+    )
 
     losses = []
 
@@ -46,9 +45,12 @@ def main(plotAttention=False) -> None:
     for epoch in range(configs['num_epochs']):
         loss_per_epoch = []
         for i in range(num_batches - 1):
-            enc_in_batch = trainEncoderInput[i * batch_size: (i+1) * batch_size]
-            dec_in_batch = trainDecoderInput[i * batch_size: (i+1) * batch_size]
-            dec_out_batch = trainDecoderOutput[i * batch_size: (i+1) * batch_size]
+            enc_in_batch = trainEncoderInput[i *
+                                             batch_size: (i+1) * batch_size]
+            dec_in_batch = trainDecoderInput[i *
+                                             batch_size: (i+1) * batch_size]
+            dec_out_batch = trainDecoderOutput[i *
+                                               batch_size: (i+1) * batch_size]
 
             with tf.GradientTape() as tape:
                 predicted = model(enc_in_batch, dec_in_batch)
@@ -59,14 +61,16 @@ def main(plotAttention=False) -> None:
             grads = tape.gradient(loss, model.trainable_variables)
 
             optimizer.apply_gradients(zip(grads, model.trainable_variables))
-        
+
         epoch_loss = np.asarray(loss_per_epoch).mean()
-        print(f"Epoch: {epoch} avg. loss: {epoch_loss}")
+        print(f"Epoch: {epoch+1} avg. loss: {epoch_loss}")
         losses.append(epoch_loss)
 
-    print(losses)
+    # print(losses)
 
-    tester(model, configs, eager = True)
+    print('Testing...')
+    tester(model, configs, eager=True)
+
 
 if __name__ == "__main__":
     main()
