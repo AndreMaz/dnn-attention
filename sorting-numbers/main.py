@@ -2,6 +2,8 @@
 from dataset.generator import generateDataset
 from models.model_factory import model_factory
 from models.inference import runSeq2SeqInference
+from utils.read_configs import get_configs
+
 import tensorflow as tf
 import numpy as np
 import sys
@@ -29,35 +31,48 @@ max_value = 100
 vocab_size = max_value + 3  # +3 for MASK, SOS and EOS
 input_length = sample_length + 1  # For special chars at the beggining of input
 
-
 def main(plotAttention = False) -> None:
+    # Get the configs
+    configs = get_configs(sys.argv)
+
     print('Generating Dataset')
     # generate training dataset
-    trainEncoderInput, trainDecoderInput, trainDecoderOutput, SOS_CODE, EOS_CODE = generateDataset(
-        num_samples_training, sample_length, max_value, vocab_size)
+    trainEncoderInput, trainDecoderInput, trainDecoderOutput = generateDataset(
+        configs['num_samples_training'],
+        configs['sample_length'],
+        configs['min_value'],
+        configs['max_value'],
+        configs['SOS_CODE'],
+        configs['EOS_CODE'],
+        configs['vocab_size']
+    )
 
     # generate validation dataset
-    valEncoderInput, valDecoderInput, valDecoderOutput, _, _ = generateDataset(
-        num_sample_validation, sample_length, max_value, vocab_size)
+    valEncoderInput, valDecoderInput, valDecoderOutput = generateDataset(
+        configs['num_samples_validation'],
+        configs['sample_length'],
+        configs['min_value'],
+        configs['max_value'],
+        configs['SOS_CODE'],
+        configs['EOS_CODE'],
+        configs['vocab_size']
+    )
     print('Dataset Generated!')
 
-    # Get model name
-    try:
-        modelName = sys.argv[1]
-    except:
-        # Use pointer by default
-        modelName = 'pointer-masking'
-
     # Create model
-    model = model_factory(modelName, vocab_size,
-                          input_length, embedding_dims, lstm_units)
+    model = model_factory(
+        configs['model_name'],
+        configs['vocab_size'],
+        configs['input_length'],
+        configs['embedding_dims'],
+        configs['lstm_units'])
     model.summary(line_length=180)
 
     model.fit(
         x=[trainEncoderInput, trainDecoderInput],
         y=trainDecoderOutput,
-        epochs=num_epochs,
-        batch_size=batch_size,
+        epochs=configs['num_epochs'],
+        batch_size=configs['batch_size'],
         shuffle=True,
         validation_data=([valEncoderInput, valDecoderInput], valDecoderOutput),
         # callbacks = [tensorboard_callback]
@@ -67,7 +82,14 @@ def main(plotAttention = False) -> None:
     num_samples_tests = 200
     correctPredictions = 0
     wrongPredictions = 0
-    trainEncoderInput, _, _, _, _ = generateDataset(num_samples_tests, sample_length, max_value, vocab_size)
+    trainEncoderInput, _, _  = generateDataset(
+        configs['num_samples_tests'],
+        configs['sample_length'],
+        configs['min_value'],
+        configs['max_value'],
+        configs['SOS_CODE'],
+        configs['EOS_CODE'],
+        configs['vocab_size'])
     for _, inputEntry in enumerate(trainEncoderInput):
         print('__________________________________________________')
 
@@ -86,7 +108,13 @@ def main(plotAttention = False) -> None:
 
         # Run the inference and generate predicted output
         predictedAnswer, attention_weights = runSeq2SeqInference(
-            model, inputEntry, vocab_size, input_length, max_value, SOS_CODE, EOS_CODE)
+            model,
+            inputEntry,
+            vocab_size,
+            input_length,
+            max_value, 
+            configs['SOS_CODE'], 
+            configs['EOS_CODE'])
         if (plotAttention == True):
             plotAttention(attention_weights, inputEntry)
         print(predictedAnswer)
@@ -128,6 +156,7 @@ def plotAttention(attention_weights, inputEntry):
     plt.xlabel('Input Sequence')
 
     plt.show(block=True)
+
 
 
 if __name__ == "__main__":

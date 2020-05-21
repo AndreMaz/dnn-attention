@@ -36,7 +36,17 @@ class Decoder(Layer):
         dec_input = tf.concat([sos_tensor, zeroed_tensor], 1)
 
         # Convert input to embeddings
-        dec_input = self.embedding(dec_input)
+        # dec_input = self.embedding(dec_input)
+
+        seq_length = encoder_input.shape[1]
+
+        for i in range(i, seq_length):
+            dec_input = self.embedding(dec_input)
+
+            dec_slice = dec_input[i]
+
+
+            # Update the dec_input
 
         prevDecoderHiddenState = dec_hidden[0]
         prevDecoderCarryState = dec_hidden[1]

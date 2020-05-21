@@ -3,10 +3,10 @@ import numpy as np
 import random
 
 
-def generateDataset(num_samples, sample_length, max_value, vocab_size):
-    min_value = 1
-    EOS_CODE = max_value + 1  # max_value is not included in range(max_value)
-    SOS_CODE = max_value + 2  # next element
+def generateDataset(num_samples, sample_length, min_value, max_value, SOS_CODE, EOS_CODE, vocab_size):
+    # min_value = 1
+    # EOS_CODE = max_value + 1  # max_value is not included in range(max_value)
+    # SOS_CODE = max_value + 2  # next element
 
     encoderInputs = []
     decoderInputs = []
@@ -55,4 +55,6 @@ def generateDataset(num_samples, sample_length, max_value, vocab_size):
 
         decoderOutputs.append(dec_out_enc)
 
-    return tf.convert_to_tensor(encoderInputs), tf.convert_to_tensor(decoderInputs), tf.convert_to_tensor(decoderOutputs), SOS_CODE, EOS_CODE
+    return tf.convert_to_tensor(encoderInputs), \
+           tf.convert_to_tensor(decoderInputs), \
+           tf.convert_to_tensor(decoderOutputs)
