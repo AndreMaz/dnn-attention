@@ -5,7 +5,7 @@ from models.inference import runSeq2SeqInference
 # For plotting
 import matplotlib.pyplot as plt
 
-def tester(model, configs, eager = False, plotAttention = False):
+def tester(model, configs, eager = False, plotAttention = False, with_trainer = True):
     num_samples_tests = configs['num_samples_tests']
     correctPredictions = 0
     wrongPredictions = 0
@@ -43,7 +43,8 @@ def tester(model, configs, eager = False, plotAttention = False):
             configs['max_value'], 
             configs['SOS_CODE'], 
             configs['EOS_CODE'],
-            eager)
+            eager,
+            with_trainer)
         if (plotAttention == True):
             plotAttention(attention_weights, inputEntry)
         print(predictedAnswer)

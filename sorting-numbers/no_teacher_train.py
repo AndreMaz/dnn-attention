@@ -32,10 +32,14 @@ def main(plotAttention=False) -> None:
     optimizer = tf.optimizers.Adam()
 
     model = EagerModelNoTrainer(
+        configs['input_length'],
         configs['vocab_size'],
         configs['embedding_dims'],
-        configs['lstm_units']
+        configs['lstm_units'],
+        configs['SOS_CODE']
     )
+
+    model(trainEncoderInput)
 
     losses = []
 
@@ -66,7 +70,7 @@ def main(plotAttention=False) -> None:
     # print(losses)
 
     print('Testing...')
-    tester(model, configs, eager=True)
+    tester(model, configs, eager=True, with_trainer=False)
 
 
 if __name__ == "__main__":

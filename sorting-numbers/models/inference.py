@@ -2,7 +2,7 @@ import sys
 sys.path.append(".")
 import numpy as np
 
-def runSeq2SeqInference(model, encoderInput, vocab_size, input_length, max_value, SOS_CODE, EOS_CODE, eager = False):
+def runSeq2SeqInference(model, encoderInput, vocab_size, input_length, max_value, SOS_CODE, EOS_CODE, eager = False, with_trainer = True):
     # Init Decoder's input to zeros
     decoderInput = np.zeros((1, input_length), dtype="float32")
     # Add start-of-sequence SOS into decoder
@@ -14,7 +14,10 @@ def runSeq2SeqInference(model, encoderInput, vocab_size, input_length, max_value
             predictOut = model.predict([encoderInput, decoderInput])
             pointer = predictOut.argmax(2)[0, i-1]
         else:
-            predictOut = model(encoderInput, decoderInput)
+            if with_trainer:
+                predictOut = model(encoderInput, decoderInput)
+            else:
+                predictOut = model(encoderInput)
             # Get the pointer
             pointer = predictOut.numpy().argmax(2)[0, i-1]
 
@@ -28,7 +31,10 @@ def runSeq2SeqInference(model, encoderInput, vocab_size, input_length, max_value
         finalPrediction = model.predict([encoderInput, decoderInput])
         finalPointer = finalPrediction.argmax(2)[0, i-1]
     else:
-        finalPrediction = model(encoderInput, decoderInput)
+        if with_trainer:
+            finalPrediction = model(encoderInput, decoderInput)
+        else:
+            finalPrediction = model(encoderInput)
         finalPointer = finalPrediction.numpy().argmax(2)[0, i-1]
 
     finalValue = encoderInput[0, finalPointer]
