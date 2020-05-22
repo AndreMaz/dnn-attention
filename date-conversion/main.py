@@ -1,9 +1,10 @@
 # import dataset.generator
 from dataset.date_format import INPUT_VOCAB, OUTPUT_VOCAB, INPUT_LENGTH, OUTPUT_LENGTH, INPUT_FNS, dateTupleToYYYYDashMMDashDD
-from dataset import generator
+from dataset.generator import generateDataSet
 from models.inference import runSeq2SeqInference
 from models.model_factory import model_factory
 from tensorflow.keras.models import Model
+from utils.read_configs import get_configs
 
 from datetime import datetime
 from tensorflow import keras
@@ -12,28 +13,30 @@ import sys
 # For plotting
 import matplotlib.pyplot as plt
 
-minYear = '1950-01-01'
-maxYear = '2050-01-01'
+def main() -> None:
+    # Get configs
+    configs = get_configs(sys.argv)
+    model_name = configs['model_name']
 
-embeddingDims = 64
-lstmUnits = 64
-
-def main(minYear: str, maxYear: str, toPlotAttention = False) -> None:
     # Generate dataset
-    trainEncoderInput, trainDecoderInput, trainDecoderOutput, valEncoderInput, valDecoderInput, valDecoderOutput, testDateTuples = generator.generateDataSet(
-        minYear, maxYear)
+    trainEncoderInput, \
+    trainDecoderInput, \
+    trainDecoderOutput, \
+    valEncoderInput, \
+    valDecoderInput, \
+    valDecoderOutput,\
+    testDateTuples = generateDataSet(configs['min_year'], configs['max_year'])
 
-    # Get model name
-    try:
-        modelName = sys.argv[1]
-        toPlotAttention = True if int(sys.argv[2]) == 1 else False
-    except:
-        # Use Luong by default
-        modelName = 'luong'
-    
     # Create Model
-    model = model_factory(modelName, len(INPUT_VOCAB), len(
-        OUTPUT_VOCAB), INPUT_LENGTH, OUTPUT_LENGTH, embeddingDims, lstmUnits)
+    model = model_factory(
+        model_name,
+        len(INPUT_VOCAB),
+        len(OUTPUT_VOCAB),
+        INPUT_LENGTH,
+        OUTPUT_LENGTH,
+        configs['embedding_dims'],
+        configs['lstm_units']
+    )
     
     # Show model stats
     model.summary(line_length=180)
@@ -57,7 +60,7 @@ def main(minYear: str, maxYear: str, toPlotAttention = False) -> None:
 
     # Create new model that will also return the attention weights
     # New model will produce two outputs: the actual prediction and the attention weights
-    if (modelName != 'seq2seq'): # Sequence 2 Sequence model doesn't have attention so we don't need to do this
+    if (model_name != 'seq2seq'): # Sequence 2 Sequence model doesn't have attention so we don't need to do this
         model = Model(
             inputs = model.input,
             # Add attention_weights to the output list
@@ -79,13 +82,13 @@ def main(minYear: str, maxYear: str, toPlotAttention = False) -> None:
             
             print(f"Correct Answer: {correctAnswer}")
             # Run the inference
-            if (modelName != 'seq2seq'):
-                outputStr, attention_weights = runSeq2SeqInference(modelName, model, inputStr)
+            if (model_name != 'seq2seq'):
+                outputStr, attention_weights = runSeq2SeqInference(model_name, model, inputStr)
 
-                if (toPlotAttention == True):
+                if (configs['to_plot_attention'] == True):
                     plotAttention(attention_weights, inputStr, outputStr, INPUT_LENGTH, OUTPUT_LENGTH)
             else:
-                outputStr = runSeq2SeqInference(modelName, model, inputStr)
+                outputStr = runSeq2SeqInference(model_name, model, inputStr)
 
             print(f"Predicted Answer: {outputStr}")
             if (outputStr == correctAnswer):
@@ -121,4 +124,4 @@ def plotAttention(attention_weights, inputStr, outputStr, INPUT_LENGTH, OUTPUT_L
     plt.show(block=True)
 
 if __name__ == "__main__":
-    main(minYear, maxYear)
+    main()

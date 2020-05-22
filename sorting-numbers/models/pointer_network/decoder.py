@@ -82,6 +82,8 @@ class DecoderNoTrainer(tf.keras.Model):
         prevDecoderCarryState = dec_hidden[1]
 
         # We will store pointers here
+        # The data will be stored in [batch_size, pointers]
+        # We will reshape it at the end
         perStepOutputs = []
 
         for i in range(1, self.input_length):

@@ -17,6 +17,20 @@ Convert dates in different formats (e.g., `"08/30/21"`, `"080120"`, `"AUG 01, 20
 - Output vocabulary size: 13
 - Output length: 10
 
+### Configs
+Configs are located at `date-conversion/config.json`
+```json
+{
+    // Range of dates that will be used to generate the dataset
+    "num_epochs": 3, // Number of epochs for training
+    "batch_size": 128, // Batch size during training
+    "min_year": "1950-01-01",
+    "max_year": "2050-01-01",
+    "embedding_dims": 64, // Encoder's and Decoder's embedding dims
+    "lstm_units": 64, // Encoder's and Decoder's LSTM units
+    "num_tests": 10 // Number of dates that will be used for testing. Each date will be converted into all possible format (there are 20 formats).
+}
+```
 
 **Input Vocabulary Mappings**
 ```
