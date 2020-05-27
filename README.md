@@ -17,6 +17,20 @@ Convert dates in different formats (e.g., `"08/30/21"`, `"080120"`, `"AUG 01, 20
 - Output vocabulary size: 13
 - Output length: 10
 
+### Configs
+Configs are located at `date-conversion/config.json`
+```json
+{
+    // Range of dates that will be used to generate the dataset
+    "num_epochs": 3, // Number of epochs for training
+    "batch_size": 128, // Batch size during training
+    "min_year": "1950-01-01",
+    "max_year": "2050-01-01",
+    "embedding_dims": 64, // Encoder's and Decoder's embedding dims
+    "lstm_units": 64, // Encoder's and Decoder's LSTM units
+    "num_tests": 10 // Number of dates that will be used for testing. Each date will be converted into all possible format (there are 20 formats).
+}
+```
 
 **Input Vocabulary Mappings**
 ```
@@ -171,6 +185,24 @@ Sorts numbers in an ascending order with Pointer Networks. For more info check t
 - Output length: 10
 
 > Note: Pointer Networks are capable of dealing with inputs of variable length. For example, we can train the model with sequence size equal to 10 but during testing we can feed sequences larger than 10 and it will still be able to sort it. However, after using `model.compile()` the model becomes "static" and it no longer accepts input sequences of variable length. I think the only way of solving this is by not using `model.compile()` and do the training (computing the loss and gradients) manually. This is a `ToDo`...
+
+### Configs
+Configs are located at `sorting-numbers/config.json`
+```json
+{
+    "num_epochs": 10, // Number of epochs for training
+    "batch_size": 128, // Batch size during training
+    "embedding_dims": 64, // Encoder's and Decoder's embedding dims
+    "lstm_units": 64, // Encoder's and Decoder's LSTM units
+    "num_samples_training": 50000, // Training sample size
+    "num_samples_validation": 5000, // Validation sample size
+    "num_samples_tests": 200, // Testing sample size
+    "sample_length": 10, // Number of number to be sorted
+    // Numbers will be samples between the min value and max_value
+    "min_value": 1, // Min value is included
+    "max_value": 100 // Max value is included
+}
+```
 
 ### Input/Output Example
 

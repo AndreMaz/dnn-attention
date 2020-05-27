@@ -1,0 +1,12 @@
+{
+    "num_epochs": 10,
+    "batch_size": 128,
+    "embedding_dims": 64,
+    "lstm_units": 64,
+    "num_samples_training": 50000,
+    "num_samples_validation": 5000,
+    "num_samples_tests": 200,
+    "sample_length": 10,
+    "min_value": 1,
+    "max_value": 100
+}
