@@ -19,7 +19,7 @@ Convert dates in different formats (e.g., `"08/30/21"`, `"080120"`, `"AUG 01, 20
 
 ### Configs
 Configs are located at `date-conversion/config.json`
-```json
+```js
 {
     // Range of dates that will be used to generate the dataset
     "num_epochs": 3, // Number of epochs for training
@@ -188,7 +188,7 @@ Sorts numbers in an ascending order with Pointer Networks. For more info check t
 
 ### Configs
 Configs are located at `sorting-numbers/config.json`
-```json
+```js
 {
     "num_epochs": 10, // Number of epochs for training
     "batch_size": 128, // Batch size during training
