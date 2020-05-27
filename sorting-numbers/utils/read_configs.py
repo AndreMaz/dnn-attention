@@ -18,7 +18,7 @@ def get_configs(argv):
 
     # Get model name from args
     try:
-        modelName = sys.argv[1]
+        modelName = argv[1]
     except:
         # Use pointer by default
         modelName = 'pointer-masking'
