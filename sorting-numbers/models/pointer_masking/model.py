@@ -1,7 +1,7 @@
 from tensorflow.keras.layers import Input
 from tensorflow.keras.models import Model
 from models.pointer_masking.encoder import Encoder
-from models.pointer_masking.decoder import Decoder
+from models.pointer_masking.decoder import Decoder, DecoderNoTrainer
 
 def createModel(vocab_size, input_length, embedding_dims, lstm_units):
     # Encoder
@@ -31,3 +31,24 @@ def createModel(vocab_size, input_length, embedding_dims, lstm_units):
     )
 
     return model
+
+
+class EagerModelNoTrainer(Model):
+    def __init__(self, input_length, vocab_size, embedding_dim, lstm_units, SOS_CODE):
+        super(EagerModelNoTrainer, self).__init__()
+        self.input_length = input_length
+        self.vocab_size = vocab_size
+        self.embedding_dim = embedding_dim
+        self.lstm_units = lstm_units
+        self.SOS_CODE = SOS_CODE
+
+        self.encoder = Encoder(self.vocab_size, self.embedding_dim, self.lstm_units)
+        self.decoder = DecoderNoTrainer(self.input_length, self.vocab_size, self.embedding_dim, self.lstm_units, self.SOS_CODE)
+
+    def call(self, encoder_input):
+        encoderHiddenStates, encoderLastHiddenState, encoderLastCarryState = self.encoder(
+        encoder_input)
+
+        decoderOutput = self.decoder([encoderLastHiddenState, encoderLastCarryState], encoderHiddenStates, encoder_input)
+
+        return decoderOutput

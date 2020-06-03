@@ -1,6 +1,7 @@
 # from dataset.dataset_generator import ArtificialDataset
 from dataset.generator import generateDataset
-from models.pointer_network.model import EagerModelNoTrainer
+from models.pointer_network.model import EagerModelNoTrainer as EagerVanilla
+from models.pointer_masking.model import EagerModelNoTrainer as EagerMasking
 from models.inference import runSeq2SeqInference
 from utils.read_configs import get_configs
 from utils.tester import tester
@@ -10,7 +11,7 @@ import numpy as np
 import sys
 
 
-def main(plotAttention=False) -> None:
+def main(plotAttention=False, maskingModel = True) -> None:
     # Get the configs
     configs = get_configs(sys.argv)
 
@@ -31,13 +32,23 @@ def main(plotAttention=False) -> None:
     loss_fn = tf.losses.CategoricalCrossentropy()
     optimizer = tf.optimizers.Adam()
 
-    model = EagerModelNoTrainer(
-        configs['input_length'],
-        configs['vocab_size'],
-        configs['embedding_dims'],
-        configs['lstm_units'],
-        configs['SOS_CODE']
-    )
+    if not maskingModel:
+        model = EagerVanilla(
+            configs['input_length'],
+            configs['vocab_size'],
+            configs['embedding_dims'],
+            configs['lstm_units'],
+            configs['SOS_CODE']
+        )
+    else:
+        model = EagerMasking(
+            configs['input_length'],
+            configs['vocab_size'],
+            configs['embedding_dims'],
+            configs['lstm_units'],
+            configs['SOS_CODE']
+        )
+
 
     model(trainEncoderInput)
 
