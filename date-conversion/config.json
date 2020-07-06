@@ -1,6 +1,6 @@
 {
     "min_year": "1950-01-01",
-    "max_year": "2050-01-01",
+    "max_year": "1950-02-01",
     "embedding_dims": 64,
     "lstm_units": 64,
     "num_epochs": 3,

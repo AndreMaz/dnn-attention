@@ -220,3 +220,11 @@ def encodeOutputDateStrings(dateStrings: list):
 
     return x
 
+
+def decode_tensor(date_tensor, vocab):
+    date = ''
+
+    for index in date_tensor[0]:
+        date = date + vocab[int(index)]
+
+    return date
