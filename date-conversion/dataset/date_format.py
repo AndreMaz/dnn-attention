@@ -42,6 +42,7 @@ INPUT_VOCAB = "\n0123456789/-., " + uniqueMonthLetters(first3Letters(MONTH_NAMES
 OUTPUT_LENGTH = 10; # Length of 'YYYY-MM-DD'.
 OUTPUT_VOCAB = "\n\t0123456789-"
 START_CODE = 1
+END_CODE = 0
 
 
 def toTwoDigitString(num: int) -> str:

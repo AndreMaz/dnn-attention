@@ -20,7 +20,7 @@ def generateOrderedDates(minYear: str, maxYear: str) -> list:
     return dates
 
 
-def dateTuplesToTensor(dateTuples):
+def dateTuplesToTensor(dateTuples, dec_output_one_hot = True):
     # Encoder Input
     inputs = []
     for _, fn in enumerate(INPUT_FNS):
@@ -37,6 +37,10 @@ def dateTuplesToTensor(dateTuples):
 
     decoderInput = encodeOutputDateStrings(isoDates).astype("float32")
 
+    if not dec_output_one_hot:
+        decoderOutput = decoderInput
+        decoderOutput = np.tile(decoderOutput, (len(INPUT_FNS), 1)).astype("int32")
+
     # Remove Last column
     decoderInput = decoderInput[..., :-1]
     # Create a single column with start code
@@ -46,18 +50,19 @@ def dateTuplesToTensor(dateTuples):
     # Tile to match the encoderInput
     decoderInput = np.tile(decoderInput, (len(INPUT_FNS), 1))
 
-    # Decoder Output
-    decoderOutput = tf.one_hot(
-        encodeOutputDateStrings(isoDates),
-        len(OUTPUT_VOCAB)
-    )
-    # Tile to match the encoderInput
-    decoderOutput = np.tile(decoderOutput, (len(INPUT_FNS), 1, 1)).astype("int32")
+    if dec_output_one_hot:
+        # Decoder Output
+        decoderOutput = tf.one_hot(
+            encodeOutputDateStrings(isoDates),
+            len(OUTPUT_VOCAB)
+        )
+        # Tile to match the encoderInput
+        decoderOutput = np.tile(decoderOutput, (len(INPUT_FNS), 1, 1)).astype("int32")
 
     return encoderInput, decoderInput, decoderOutput
 
 
-def generateDataSet(minYear="1950-01-01", maxYear="2050-01-01", trainSplit=0.25, validationSplit=0.15):
+def generateDataSet(minYear="1950-01-01", maxYear="2050-01-01", trainSplit=0.25, validationSplit=0.15, dec_output_one_hot = True):
     dateTuples = generateOrderedDates(minYear, maxYear)
     
     np.random.shuffle(dateTuples)
@@ -66,10 +71,10 @@ def generateDataSet(minYear="1950-01-01", maxYear="2050-01-01", trainSplit=0.25,
     numValidation = floor(len(dateTuples)*validationSplit)
 
     trainEncoderInput, trainDecoderInput, trainDecoderOutput = dateTuplesToTensor(
-        dateTuples[0:numTrain])
+        dateTuples[0:numTrain], dec_output_one_hot)
 
     valEncoderInput, valDecoderInput, valDecoderOutput = dateTuplesToTensor(
-        dateTuples[numTrain:numTrain+numValidation])
+        dateTuples[numTrain:numTrain+numValidation], dec_output_one_hot)
 
     testDateTuples = dateTuples[numTrain+numValidation: len(dateTuples)]
 
