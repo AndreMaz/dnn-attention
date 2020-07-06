@@ -117,9 +117,10 @@ transformer = Transformer(num_layers, d_model, num_heads, dff,
 train_step_signature = [
     tf.TensorSpec(shape=(None, None), dtype=tf.int64),
     tf.TensorSpec(shape=(None, None), dtype=tf.int64),
+    tf.TensorSpec(shape=(None, None), dtype=tf.int64),
 ]
-# @tf.function(input_signature=train_step_signature)
 
+@tf.function(input_signature=train_step_signature)
 def train_step(inp, tar, real):
   tar_inp = tar # tar[:, :-1]
   tar_real = real # tar[:, 1:]
@@ -174,7 +175,7 @@ def train(min_year="1950-01-01", max_year="1950-02-01", EPOCHS = 500):
           #   print ('Saving checkpoint for epoch {} at {}'.format(epoch+1,
           #                                                       ckpt_save_path))
           
-      print ('Epoch {} Loss {:.4f} Accuracy {:.4f}'.format(epoch + 1, 
+      print ('Epoch {} Loss {:.6f} Accuracy {:.6f}'.format(epoch + 1, 
                                                       train_loss.result(), 
                                                       train_accuracy.result()))
 
@@ -246,20 +247,21 @@ def plot_attention_weights(attention, sentence, result, layer):
   
   sentence = encodeInputDateStrings([sentence])[0]
   
+  # Remove batch dim
   attention = tf.squeeze(attention[layer], axis=0)
   
   for head in range(attention.shape[0]):
     ax = fig.add_subplot(2, 4, head+1)
     
     # plot the attention weights
-    ax.matshow(attention[head][:-1, :], cmap='viridis')
+    ax.matshow(attention[head][:, :], cmap='viridis')
 
     fontdict = {'fontsize': 10}
     
-    ax.set_xticks(range(len(sentence)+2))
+    ax.set_xticks(range(len(sentence)))
     ax.set_yticks(range(len(result)))
     
-    ax.set_ylim(len(result)-1.5, -0.5)
+    # ax.set_ylim(len(result)-1.5, -0.5)
         
     ax.set_xticklabels([INPUT_VOCAB[int(i)] for i in sentence], 
         fontdict=fontdict, rotation=90)
@@ -274,8 +276,7 @@ def plot_attention_weights(attention, sentence, result, layer):
 
 def convert_date(sentence, correct_answer, plot=''):
   result, attention_weights = evaluate(sentence)
-  result = result.numpy()
-  result = result[1:]
+  result = result.numpy()[1:] # Remove SOS symbol
 
   predicted_sentence = ""
   for i in result:
@@ -283,7 +284,7 @@ def convert_date(sentence, correct_answer, plot=''):
    # tokenizer_en.decode([i for i in result])  
 
   print('Input: {}'.format(sentence))
-  print('Predicted translation: {}'.format(correct_answer))
+  print('Correct   translation: {}'.format(correct_answer))
   print('Predicted translation: {}'.format(predicted_sentence))
   
   if plot:
