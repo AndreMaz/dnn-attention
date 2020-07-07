@@ -225,7 +225,7 @@ def encodeOutputDateStrings(dateStrings: list):
 def decode_tensor(date_tensor, vocab):
     date = ''
 
-    for index in date_tensor[0]:
+    for index in date_tensor:
         date = date + vocab[int(index)]
 
     return date

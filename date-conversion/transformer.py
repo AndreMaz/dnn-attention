@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 from dataset.date_format import START_CODE, INPUT_VOCAB, OUTPUT_VOCAB, INPUT_LENGTH, OUTPUT_LENGTH, INPUT_FNS, dateTupleToYYYYDashMMDashDD, encodeInputDateStrings, decode_tensor
 from dataset.generator import generateDataSet
-from models.transformer.transformer import Transformer
+from models.transformer.model import Transformer
 
 num_layers = 4
 d_model = 64
@@ -133,7 +133,8 @@ def train_step(inp, tar, real):
                                  enc_padding_mask, 
                                  combined_mask, 
                                  dec_padding_mask)
-    loss = loss_function(tar_real, predictions)
+    # loss = loss_function(tar_real, predictions)
+    loss = loss_object(tar_real, predictions)
 
   gradients = tape.gradient(loss, transformer.trainable_variables)    
   optimizer.apply_gradients(zip(gradients, transformer.trainable_variables))
@@ -142,12 +143,13 @@ def train_step(inp, tar, real):
   train_accuracy(tar_real, predictions)
 
 
-def train(min_year="1950-01-01", max_year="1950-02-01", EPOCHS = 500):
+def train(min_year="1950-01-01", max_year="2050-01-01", EPOCHS = 20):
     # Generate dataset
 
+    print('Generating dataset...')
     enc_input, dec_input, dec_out, _, _, _, test_data = generateDataSet(
-        min_year, max_year, dec_output_one_hot=False)
-
+        min_year, max_year, dec_output_one_hot=False, trainSplit=0.99, validationSplit=0)
+    print('Dataset generated!')
     # test(test_data)
 
     batch_size = 64
@@ -165,10 +167,10 @@ def train(min_year="1950-01-01", max_year="1950-02-01", EPOCHS = 500):
           real = dec_out[batch * batch_size: (batch+1) * batch_size]
 
           train_step(inp, tar, real)
-          
-          # if batch % 50 == 0:
-          #   print ('Epoch {} Batch {} Loss {:.4f} Accuracy {:.4f}'.format(
-          #       epoch + 1, batch, train_loss.result(), train_accuracy.result()))
+
+          if batch % 50 == 0:
+             print ('Epoch {} Batch {} Loss {:.4f} Accuracy {:.4f}'.format(
+                 epoch + 1, batch, train_loss.result(), train_accuracy.result()))
             
           # if (epoch + 1) % 5 == 0:
           #   ckpt_save_path = ckpt_manager.save()
@@ -186,20 +188,32 @@ def train(min_year="1950-01-01", max_year="1950-02-01", EPOCHS = 500):
 ####################
 #### EVALUATION ####
 ####################
-def test(test_data, num_tests = 1):
+def test(test_data, num_tests = 10):
   # Do only one test
-  input_str = INPUT_FNS[0](test_data[0])
-  correct_answer = dateTupleToYYYYDashMMDashDD(test_data[0])
-  convert_date(input_str, correct_answer, plot='decoder_layer4_block2')
+  # input_str = INPUT_FNS[0](test_data[0])
+  # correct_answer = dateTupleToYYYYDashMMDashDD(test_data[0])
+  # predicted_answer = convert_date(input_str, correct_answer, plot='decoder_layer4_block2')
 
-    # for n in range(num_tests):
-    #   for _, fn in enumerate(INPUT_FNS):
-    #     input_str = fn(test_data[n])
+  totalTests = num_tests*len(INPUT_FNS)
+  correctPredictions = 0
+  wrongPredictions = 0
 
-    #     correct_answer = dateTupleToYYYYDashMMDashDD(test_data[n])
+  for n in range(num_tests):
+    for _, fn in enumerate(INPUT_FNS):
+      input_str = fn(test_data[n])
 
-    #     convert_date(input_str, correct_answer, plot='decoder_layer4_block2')
+      correct_answer = dateTupleToYYYYDashMMDashDD(test_data[n])
 
+      predicted_answer = convert_date(input_str, correct_answer, plot='')
+
+      if (correct_answer == predicted_answer):
+        correctPredictions += 1
+        print('CORRECT')
+      else:
+        wrongPredictions += 1
+        print('WRONG!')
+
+  print(f"Correct Predictions: {correctPredictions/totalTests} || Wrong Predictions: {wrongPredictions/totalTests}")
 
 def evaluate(inp_sentence):
   # start_token = [tokenizer_pt.vocab_size]
@@ -286,9 +300,11 @@ def convert_date(sentence, correct_answer, plot=''):
   print('Input: {}'.format(sentence))
   print('Correct   translation: {}'.format(correct_answer))
   print('Predicted translation: {}'.format(predicted_sentence))
-  
+
   if plot:
     plot_attention_weights(attention_weights, sentence, result, plot)
+
+  return predicted_sentence
 
 if __name__ == "__main__":
     train()
