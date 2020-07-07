@@ -9,8 +9,8 @@ from dataset.generator import generateDataSet
 from models.transformer.model import Transformer
 
 num_layers = 4
-d_model = 64
-dff = 64
+d_model = 32
+dff = 32
 num_heads = 8
 
 input_vocab_size = len(INPUT_VOCAB)
@@ -36,8 +36,8 @@ class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
     return tf.math.rsqrt(self.d_model) * tf.math.minimum(arg1, arg2)
 
 learning_rate = CustomSchedule(d_model)
-optimizer = tf.keras.optimizers.Adam(learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
-
+# optimizer = tf.keras.optimizers.Adam(learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
+optimizer = tf.keras.optimizers.Adam()
 
 ############################
 ##### LOSS AND METRICS #####
@@ -143,7 +143,7 @@ def train_step(inp, tar, real):
   train_accuracy(tar_real, predictions)
 
 
-def train(min_year="1950-01-01", max_year="2050-01-01", EPOCHS = 20):
+def train(min_year="1950-01-01", max_year="2050-01-01", EPOCHS = 30, batch_size = 512):
     # Generate dataset
 
     print('Generating dataset...')
@@ -152,7 +152,6 @@ def train(min_year="1950-01-01", max_year="2050-01-01", EPOCHS = 20):
     print('Dataset generated!')
     # test(test_data)
 
-    batch_size = 64
     num_batches = int(len(enc_input) / batch_size)
 
     for epoch in range(EPOCHS):
@@ -194,17 +193,22 @@ def test(test_data, num_tests = 10):
   # correct_answer = dateTupleToYYYYDashMMDashDD(test_data[0])
   # predicted_answer = convert_date(input_str, correct_answer, plot='decoder_layer4_block2')
 
-  totalTests = num_tests*len(INPUT_FNS)
+  totalTests = len(test_data)*len(INPUT_FNS)
   correctPredictions = 0
   wrongPredictions = 0
 
-  for n in range(num_tests):
+  for date_tuple in test_data:
     for _, fn in enumerate(INPUT_FNS):
-      input_str = fn(test_data[n])
+      print('_________________________________')
+      input_str = fn(date_tuple)
 
-      correct_answer = dateTupleToYYYYDashMMDashDD(test_data[n])
+      correct_answer = dateTupleToYYYYDashMMDashDD(date_tuple)
 
       predicted_answer = convert_date(input_str, correct_answer, plot='')
+
+      print('Input: {}'.format(input_str))
+      print('Correct   translation: {}'.format(correct_answer))
+      print('Predicted translation: {}'.format(predicted_answer))
 
       if (correct_answer == predicted_answer):
         correctPredictions += 1
@@ -213,6 +217,9 @@ def test(test_data, num_tests = 10):
         wrongPredictions += 1
         print('WRONG!')
 
+      print('---------------------------------')
+
+  print(f"Test Sample Size: {len(test_data)} || Number of Formats {len(INPUT_FNS)} || Total Tests {totalTests}")
   print(f"Correct Predictions: {correctPredictions/totalTests} || Wrong Predictions: {wrongPredictions/totalTests}")
 
 def evaluate(inp_sentence):
@@ -296,10 +303,6 @@ def convert_date(sentence, correct_answer, plot=''):
   for i in result:
     predicted_sentence += OUTPUT_VOCAB[int(i)]
    # tokenizer_en.decode([i for i in result])  
-
-  print('Input: {}'.format(sentence))
-  print('Correct   translation: {}'.format(correct_answer))
-  print('Predicted translation: {}'.format(predicted_sentence))
 
   if plot:
     plot_attention_weights(attention_weights, sentence, result, plot)
