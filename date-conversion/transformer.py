@@ -8,10 +8,10 @@ from dataset.date_format import START_CODE, INPUT_VOCAB, OUTPUT_VOCAB, INPUT_LEN
 from dataset.generator import generateDataSet
 from models.transformer.model import Transformer
 
-num_layers = 2
+num_layers = 1
 d_model = 64
 dff = 64
-num_heads = 4
+num_heads = 8
 
 input_vocab_size = len(INPUT_VOCAB)
 target_vocab_size = len(OUTPUT_VOCAB)
@@ -92,11 +92,16 @@ def create_masks(inp, tar):
 #### TRANSFORMER MODEL #####
 ############################
 
-transformer = Transformer(num_layers, d_model, num_heads, dff,
-                          input_vocab_size, target_vocab_size, 
+transformer = Transformer(num_layers,
+                          d_model,
+                          num_heads,
+                          dff,
+                          input_vocab_size,
+                          target_vocab_size, 
                           pe_input=input_vocab_size, 
                           pe_target=target_vocab_size,
-                          rate=dropout_rate)
+                          rate=dropout_rate
+                        )
 ######################
 #### CHECKPOINTS #####
 ######################
@@ -128,10 +133,11 @@ def train_step(inp, tar, real):
   enc_padding_mask, combined_mask, dec_padding_mask = create_masks(inp, tar_inp)
   
   with tf.GradientTape() as tape:
-    predictions, _ = transformer(inp, tar_inp, 
-                                 True, 
-                                 enc_padding_mask, 
-                                 combined_mask, 
+    predictions, _ = transformer(inp,
+                                 tar_inp,
+                                 True,
+                                 enc_padding_mask,
+                                 combined_mask,
                                  dec_padding_mask)
     # loss = loss_function(tar_real, predictions)
     loss = loss_object(tar_real, predictions)
@@ -143,7 +149,7 @@ def train_step(inp, tar, real):
   train_accuracy(tar_real, predictions)
 
 
-def train(min_year="1950-01-01", max_year="2050-01-01", EPOCHS = 30, batch_size = 512):
+def train(min_year="1950-01-01", max_year="2050-01-01", EPOCHS = 70, batch_size = 512):
     # Generate dataset
 
     print('Generating dataset...')
@@ -168,7 +174,7 @@ def train(min_year="1950-01-01", max_year="2050-01-01", EPOCHS = 30, batch_size 
           train_step(inp, tar, real)
 
           if batch % 50 == 0:
-             print ('Epoch {} Batch {} Loss {:.4f} Accuracy {:.4f}'.format(
+             print ('Epoch {} Batch {} Loss {:.6f} Accuracy {:.6f}'.format(
                  epoch + 1, batch, train_loss.result(), train_accuracy.result()))
             
           # if (epoch + 1) % 5 == 0:
@@ -196,6 +202,8 @@ def test(test_data, num_tests = 10):
   totalTests = len(test_data)*len(INPUT_FNS)
   correctPredictions = 0
   wrongPredictions = 0
+
+  # test_data = test_data[:num_tests]
 
   for date_tuple in test_data:
     for _, fn in enumerate(INPUT_FNS):
