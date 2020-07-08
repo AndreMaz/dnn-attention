@@ -8,14 +8,14 @@ from dataset.date_format import START_CODE, INPUT_VOCAB, OUTPUT_VOCAB, INPUT_LEN
 from dataset.generator import generateDataSet
 from models.transformer.model import Transformer
 
-num_layers = 4
-d_model = 32
-dff = 32
-num_heads = 8
+num_layers = 2
+d_model = 64
+dff = 64
+num_heads = 4
 
 input_vocab_size = len(INPUT_VOCAB)
 target_vocab_size = len(OUTPUT_VOCAB)
-dropout_rate = 0.1
+dropout_rate = 0.01
 
 #####################
 ##### OPTIMIZER #####
