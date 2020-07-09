@@ -15,8 +15,8 @@ class Decoder(tf.keras.layers.Layer):
     self.embedding = tf.keras.layers.Embedding(target_vocab_size, d_model)
     self.pos_encoding = positional_encoding(maximum_position_encoding, d_model)
     
-    # self.dec_layers = [DecoderLayer(d_model, num_heads, dff, rate) 
-    #                   for _ in range(num_layers)]
+    self.dec_layers = [DecoderLayer(d_model, num_heads, dff, rate) 
+                       for _ in range(num_layers)]
 
     self.last_decoder_layer = LastDecoderLayer(d_model, num_heads, dff, rate)
 
@@ -34,9 +34,9 @@ class Decoder(tf.keras.layers.Layer):
     
     x = self.dropout(x, training=training)
 
-    # for i in range(self.num_layers):
-    #  x, block1, block2 = self.dec_layers[i](x, enc_output, training,
-    #                                         look_ahead_mask, padding_mask)
+    for i in range(self.num_layers):
+      x, block1, block2 = self.dec_layers[i](x, enc_output, training,
+                                             look_ahead_mask, padding_mask)
       
     #  attention_weights['decoder_layer{}_block1'.format(i+1)] = block1
     #  attention_weights['decoder_layer{}_block2'.format(i+1)] = block2

@@ -45,7 +45,7 @@ optimizer = tf.keras.optimizers.Adam()
 ##### LOSS AND METRICS #####
 ############################
 # loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True, reduction='none')
-loss_object = tf.keras.losses.CategoricalCrossentropy(from_logits=True, reduction='none')
+loss_object = tf.keras.losses.CategoricalCrossentropy(from_logits=False, reduction='none')
 
 def loss_function(real, pred):
   mask = tf.math.logical_not(tf.math.equal(real, 0))
@@ -124,9 +124,9 @@ transformer = Transformer(num_layers,
 ####################
 
 train_step_signature = [
-    tf.TensorSpec(shape=(None, None), dtype=tf.int64),
-    tf.TensorSpec(shape=(None, None), dtype=tf.int64),
-    tf.TensorSpec(shape=(None, None, None), dtype=tf.int64),
+    tf.TensorSpec(shape=(None, None), dtype=tf.float32),
+    tf.TensorSpec(shape=(None, None), dtype=tf.float32),
+    tf.TensorSpec(shape=(None, None, None), dtype=tf.int32),
 ]
 
 # @tf.function(input_signature=train_step_signature)
@@ -153,7 +153,7 @@ def train_step(inp, tar, real):
   train_accuracy(tar_real, combined_attention)
 
 
-def train(EPOCHS = 70, batch_size = 1):
+def train(EPOCHS = 70, batch_size = 128):
     # Generate dataset
 
     print('Generating dataset...')

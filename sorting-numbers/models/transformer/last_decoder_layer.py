@@ -1,7 +1,8 @@
 import tensorflow as tf
 from models.transformer.attention import MultiHeadAttention
-from models.transformer.custom_attention import PointerMultiHeadAttention
 from models.transformer.utils import point_wise_feed_forward_network
+from models.transformer.custom_attention import PointerMultiHeadAttention
+from models.transformer.custom_attention import PointerAttention
 
 class LastDecoderLayer(tf.keras.layers.Layer):
   def __init__(self, d_model, num_heads, dff, rate=0.1):
@@ -9,6 +10,8 @@ class LastDecoderLayer(tf.keras.layers.Layer):
 
     self.mha1 = MultiHeadAttention(d_model, num_heads)
     self.mha2 = PointerMultiHeadAttention(d_model, num_heads)
+
+    self.pointer_attention = PointerAttention()
 
     # self.ffn = point_wise_feed_forward_network(d_model, dff)
  
@@ -29,7 +32,9 @@ class LastDecoderLayer(tf.keras.layers.Layer):
     attn1 = self.dropout1(attn1, training=training)
     out1 = self.layernorm1(attn1 + x)
     
-    combined_attention = self.mha2(
-        enc_output, enc_output, out1, padding_mask)  # (batch_size, target_seq_len, d_model)
+    # combined_attention = self.mha2(
+    #    enc_output, enc_output, out1, padding_mask)  # (batch_size, target_seq_len, d_model)
     
+    combined_attention = self.pointer_attention(out1, enc_output)
+
     return combined_attention
