@@ -16,9 +16,9 @@ class MultiHeadAttention(tf.keras.layers.Layer):
     self.wv = tf.keras.layers.Dense(d_model)
     
     self.dense = tf.keras.layers.Dense(d_model)
-        
+
   def split_heads(self, x, batch_size):
-    """Split the last dimension into (num_heads, depth).
+    """Split the last (features) dimension into (num_heads, depth).
     Transpose the result such that the shape is (batch_size, num_heads, seq_len, depth)
     """
     x = tf.reshape(x, (batch_size, -1, self.num_heads, self.depth))
@@ -39,7 +39,6 @@ class MultiHeadAttention(tf.keras.layers.Layer):
     # attention_weights.shape == (batch_size, num_heads, seq_len_q, seq_len_k)
     scaled_attention, attention_weights = scaled_dot_product_attention(
         q, k, v, mask)
-    
     scaled_attention = tf.transpose(scaled_attention, perm=[0, 2, 1, 3])  # (batch_size, seq_len_q, num_heads, depth)
 
     concat_attention = tf.reshape(scaled_attention, 
