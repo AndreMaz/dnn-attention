@@ -13,16 +13,9 @@ class LastDecoderLayer(tf.keras.layers.Layer):
 
     self.pointer_attention = PointerAttention()
 
-    # self.ffn = point_wise_feed_forward_network(d_model, dff)
- 
     self.layernorm1 = tf.keras.layers.LayerNormalization(epsilon=1e-6)
-    # self.layernorm2 = tf.keras.layers.LayerNormalization(epsilon=1e-6)
-    # self.layernorm3 = tf.keras.layers.LayerNormalization(epsilon=1e-6)
     
     self.dropout1 = tf.keras.layers.Dropout(rate)
-    # self.dropout2 = tf.keras.layers.Dropout(rate)
-    # self.dropout3 = tf.keras.layers.Dropout(rate)
-    
     
   def call(self, x, enc_output, training, 
            look_ahead_mask, padding_mask):
@@ -31,9 +24,6 @@ class LastDecoderLayer(tf.keras.layers.Layer):
     attn1, attn_weights_block1 = self.mha1(x, x, x, look_ahead_mask)  # (batch_size, target_seq_len, d_model)
     attn1 = self.dropout1(attn1, training=training)
     out1 = self.layernorm1(attn1 + x)
-    
-    # combined_attention = self.mha2(
-    #    enc_output, enc_output, out1, padding_mask)  # (batch_size, target_seq_len, d_model)
     
     combined_attention = self.pointer_attention(out1, enc_output)
 
