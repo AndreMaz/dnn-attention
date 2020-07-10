@@ -1,6 +1,6 @@
 import tensorflow as tf
-from models.transformer.encoder_layer import EncoderLayer
-from models.transformer.utils import positional_encoding
+from models.transformer_masking.encoder_layer import EncoderLayer
+from models.transformer_masking.utils import positional_encoding
 
 class Encoder(tf.keras.layers.Layer):
   def __init__(self, num_layers, d_model, num_heads, dff, input_vocab_size,

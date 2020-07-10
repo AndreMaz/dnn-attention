@@ -1,6 +1,6 @@
 import tensorflow as tf
-from models.transformer.decoder import Decoder
-from models.transformer.encoder import Encoder
+from models.transformer_masking.decoder import Decoder
+from models.transformer_masking.encoder import Encoder
 
 class Transformer(tf.keras.Model):
   def __init__(self, num_layers, d_model, num_heads, dff, input_vocab_size, 

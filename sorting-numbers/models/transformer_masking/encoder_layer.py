@@ -1,6 +1,6 @@
 import tensorflow as tf
-from models.transformer.attention import MultiHeadAttention
-from models.transformer.utils import point_wise_feed_forward_network
+from models.transformer_masking.attention import MultiHeadAttention
+from models.transformer_masking.utils import point_wise_feed_forward_network
 
 class EncoderLayer(tf.keras.layers.Layer):
   def __init__(self, d_model, num_heads, dff, rate=0.1):

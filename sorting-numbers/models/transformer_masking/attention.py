@@ -1,5 +1,5 @@
 import tensorflow as tf
-from models.transformer.utils import scaled_dot_product_attention
+from models.transformer_masking.utils import scaled_dot_product_attention
 
 class MultiHeadAttention(tf.keras.layers.Layer):
   def __init__(self, d_model, num_heads):

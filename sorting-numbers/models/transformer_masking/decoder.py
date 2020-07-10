@@ -1,8 +1,8 @@
 import tensorflow as tf
-from models.transformer.decoder_layer import DecoderLayer
-from models.transformer.utils import positional_encoding
+from models.transformer_masking.decoder_layer import DecoderLayer
+from models.transformer_masking.utils import positional_encoding
 
-from models.transformer.last_decoder_layer import LastDecoderLayer
+from models.transformer_masking.last_decoder_layer import LastDecoderLayer
 
 class Decoder(tf.keras.layers.Layer):
   def __init__(self, num_layers, d_model, num_heads, dff, target_vocab_size,
