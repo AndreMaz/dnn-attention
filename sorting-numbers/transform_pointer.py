@@ -1,5 +1,6 @@
 import time
 import tensorflow as tf
+import numpy as np
 import sys
 # For plotting
 import matplotlib.pyplot as plt
@@ -138,11 +139,12 @@ def train_step(inp, tar, real):
   
   with tf.GradientTape() as tape:
     combined_attention = transformer(inp,
-                                 tar_inp,
-                                 True,
-                                 enc_padding_mask,
-                                 combined_mask,
-                                 dec_padding_mask)
+                                     tar_inp,
+                                     True,
+                                     enc_padding_mask,
+                                     combined_mask,
+                                     dec_padding_mask
+                                     )
     # loss = loss_function(tar_real, predictions)
     loss = loss_object(tar_real, combined_attention)
 
@@ -199,5 +201,121 @@ def train(EPOCHS = 30, batch_size = 128):
 
       # print ('Time taken for 1 epoch: {} secs\n'.format(time.time() - start))
 
+
+def tester(model, configs, eager = False, toPlotAttention = False, with_trainer = True):
+    num_samples_tests = configs['num_samples_tests']
+    correctPredictions = 0
+    wrongPredictions = 0
+
+    trainEncoderInput, _, _  = generateDataset(
+        configs['num_samples_tests'],
+        configs['sample_length'],
+        configs['min_value'],
+        configs['max_value'],
+        configs['SOS_CODE'],
+        configs['EOS_CODE'],
+        configs['vocab_size'])
+    for _, inputEntry in enumerate(trainEncoderInput):
+        print('__________________________________________________')
+
+        # print number sequence without EOS
+        print(list(inputEntry.numpy().astype("int16")[1:]))
+
+        # Generate correct answer
+        correctAnswer = list(inputEntry.numpy().astype("int16"))
+        # Remove EOS, sort the numbers and print the correct result
+        correctAnswer = correctAnswer[1:]
+        correctAnswer.sort()
+        print(correctAnswer)
+
+        # Add the batch dimension [batch=1, features]
+        inputEntry = tf.expand_dims(inputEntry, 0)
+
+        # Run the inference and generate predicted output
+        predictedAnswer, attention_weights = evaluate(model,
+                                                      inputEntry,
+                                                      configs['input_length'],
+                                                      configs['SOS_CODE'],
+                                                      eager,
+                                                      with_trainer
+                                                      )
+        print(predictedAnswer)
+
+        if (toPlotAttention == True):
+            plotAttention(attention_weights, inputEntry)
+
+        # Compute the diff between the correct answer and predicted
+        # If diff is equal to 0 then numbers are sorted correctly
+        diff = []
+        for index, _ in enumerate(correctAnswer):
+            diff.append(correctAnswer[index] - predictedAnswer[index])
+
+        # If all numbers are equal to 0
+        if (all(result == 0 for (result) in diff)):
+            correctPredictions += 1
+            print('______________________OK__________________________')
+        else:
+            wrongPredictions += 1
+            print('_____________________WRONG!_______________________')
+
+    print(
+        f"Correct Predictions: {correctPredictions/num_samples_tests} || Wrong Predictions: {wrongPredictions/num_samples_tests}")
+
+def evaluate(model, encoder_input, input_length, SOS_CODE, eager = False, with_trainer = True):
+    # Init Decoder's input to zeros
+    decoderInput = np.zeros((1, input_length), dtype="float32")
+    # Add start-of-sequence SOS into decoder
+    decoderInput[0,0] = SOS_CODE
+
+    decoder_input = [SOS_CODE]
+    output = tf.expand_dims(decoder_input, 0)
+
+    for i in range(input_length):
+      enc_padding_mask, combined_mask, dec_padding_mask = create_masks(
+        encoder_input, output)
+
+      # print(output)
+
+      attention_weights = transformer(encoder_input,
+                                      output,
+                                      False,
+                                      enc_padding_mask,
+                                      combined_mask,
+                                      dec_padding_mask
+                                      )
+      pointer_index = attention_weights.numpy().argmax(2)[0, -1]
+      pointed_value = encoder_input.numpy()[0, pointer_index]
+      
+      pointed_value = np.array(([[pointed_value]]), dtype='int32')
+
+      output = tf.concat([output, pointed_value], axis=-1)
+
+    # Return only the number sequence
+    # Drops the SOS and EOS
+    output = list(output.numpy()[0].astype("int16"))[1:-1]
+
+    return output, attention_weights
+
+def plotAttention(attention_weights, inputEntry):
+    # print(attention_weights[0].shape)
+    plt.matshow(attention_weights[0])
+
+    xTicksNames = list(inputEntry[0].numpy().astype("int16"))
+    inputLength = len(xTicksNames)
+
+    yTicksNames = []
+    for i in range(inputLength):
+        yTicksNames.append(f"step {i}")
+
+    plt.yticks(range(inputLength), yTicksNames)
+
+    plt.xticks(range(inputLength), xTicksNames)
+
+    plt.ylabel('Pointer Probability')
+    plt.xlabel('Input Sequence')
+
+    plt.show(block=True)
+
 if __name__ == "__main__":
     train()
+    tester(transformer, configs, toPlotAttention=True, with_trainer=True)
