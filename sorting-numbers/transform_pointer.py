@@ -153,7 +153,7 @@ def train_step(inp, tar, real):
   train_accuracy(tar_real, combined_attention)
 
 
-def train(EPOCHS = 70, batch_size = 128):
+def train(EPOCHS = 30, batch_size = 128):
     # Generate dataset
 
     print('Generating dataset...')
