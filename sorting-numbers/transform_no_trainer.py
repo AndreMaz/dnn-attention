@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 from utils.read_configs import get_configs
 from dataset.generator import generateDataset
-from models.transformer.model import Transformer
+from models.transformer_masking.model import Transformer
 
 configs = get_configs(sys.argv)
 
