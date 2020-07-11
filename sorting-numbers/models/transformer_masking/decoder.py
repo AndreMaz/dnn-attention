@@ -33,6 +33,7 @@ class Decoder(tf.keras.layers.Layer):
     self.dropout = tf.keras.layers.Dropout(rate)
     
   def call(self,
+           dec_input,
            enc_input,
            enc_output,
            training,
@@ -69,8 +70,8 @@ class Decoder(tf.keras.layers.Layer):
         x, block1, block2 = self.dec_layers[i](x, enc_output, training,
                                               look_ahead_mask, padding_mask)
         
-      #  attention_weights['decoder_layer{}_block1'.format(i+1)] = block1
-      #  attention_weights['decoder_layer{}_block2'.format(i+1)] = block2
+      attention_weights['decoder_layer{}_block1'.format(i+1)] = block1
+      attention_weights['decoder_layer{}_block2'.format(i+1)] = block2
       
       combined_attention = self.last_decoder_layer(x, enc_output, training, look_ahead_mask, padding_mask)
 

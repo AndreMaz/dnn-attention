@@ -97,8 +97,15 @@ def train_step(encoder_input, decoder_output):
   #  encoder_input, tar_inp
   # )
   
+  # Init the decoder's input
+  # Decoder's input starts with SOS code
+  batch_size = encoder_input.shape[0]
+  dec_input = tf.fill([batch_size, 1], configs['SOS_CODE'])
+
+
   with tf.GradientTape() as tape:
     combined_attention = transformer(encoder_input,
+                                     dec_input,
                                      True,
                                      None,
                                      None,
@@ -222,17 +229,13 @@ def tester(model, configs, eager = False, toPlotAttention = False, with_trainer 
 
 def evaluate(model, encoder_input, input_length, SOS_CODE, eager = False, with_trainer = True):
 
-    # decoder_input = [SOS_CODE]
-    # output = tf.expand_dims(decoder_input, 0)
-
+    # Init the decoder's input
+    # Decoder's input starts with SOS code
     batch_size = encoder_input.shape[0]
-    time_steps = encoder_input.shape[1]
-
-    # Create a tensor with the batch indices
-    time_indices = tf.convert_to_tensor(
-            list(range(time_steps)), dtype='int32')
+    dec_input = tf.fill([batch_size, 1], configs['SOS_CODE'])
 
     attention_weights = transformer(encoder_input,
+                                    dec_input,
                                     False,
                                     None,
                                     None,

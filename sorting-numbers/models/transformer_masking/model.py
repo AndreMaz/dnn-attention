@@ -38,6 +38,7 @@ class Transformer(tf.keras.Model):
 
   def call(self,
            encoder_input,
+           decoder_input,
            training: bool,
            enc_padding_mask,
            look_ahead_mask,
@@ -51,7 +52,8 @@ class Transformer(tf.keras.Model):
     
     # Returns attentions with pointer locations
     # combined_attention.shape == (batch_size, inp_seq_len, inp_seq_len)
-    combined_attention = self.decoder(encoder_input,
+    combined_attention = self.decoder(decoder_input,
+                                      encoder_input,
                                       enc_output,
                                       training,
                                       look_ahead_mask,
