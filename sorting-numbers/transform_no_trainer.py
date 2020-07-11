@@ -114,7 +114,7 @@ def train_step(encoder_input, decoder_output):
   train_accuracy(decoder_output, combined_attention)
 
 
-def train(EPOCHS = 30, batch_size = 128):
+def train(EPOCHS = 2, batch_size = 128):
     # Generate dataset
 
     print('Generating dataset...')
@@ -221,36 +221,33 @@ def tester(model, configs, eager = False, toPlotAttention = False, with_trainer 
         f"Correct Predictions: {correctPredictions/num_samples_tests} || Wrong Predictions: {wrongPredictions/num_samples_tests}")
 
 def evaluate(model, encoder_input, input_length, SOS_CODE, eager = False, with_trainer = True):
-    # Init Decoder's input to zeros
-    # decoderInput = np.zeros((1, input_length), dtype="float32")
-    # Add start-of-sequence SOS into decoder
-    # decoderInput[0,0] = SOS_CODE
 
-    decoder_input = [SOS_CODE]
-    output = tf.expand_dims(decoder_input, 0)
+    # decoder_input = [SOS_CODE]
+    # output = tf.expand_dims(decoder_input, 0)
 
-    for i in range(input_length):
-      # enc_padding_mask, combined_mask, dec_padding_mask = create_masks(
-      #   encoder_input, output)
+    batch_size = encoder_input.shape[0]
+    time_steps = encoder_input.shape[1]
 
-      # print(output)
+    # Create a tensor with the batch indices
+    time_indices = tf.convert_to_tensor(
+            list(range(time_steps)), dtype='int32')
 
-      attention_weights = transformer(encoder_input,
-                                      False,
-                                      None,
-                                      None,
-                                      None
-                                      )
-      pointer_index = attention_weights.numpy().argmax(2)[0, -1]
-      pointed_value = encoder_input.numpy()[0, pointer_index]
-      
-      pointed_value = np.array(([[pointed_value]]), dtype='int32')
+    attention_weights = transformer(encoder_input,
+                                    False,
+                                    None,
+                                    None,
+                                    None
+                                    )
+    # encoder_input = np.reshape(encoder_input, (1, time_steps))
 
-      output = tf.concat([output, pointed_value], axis=-1)
-
-    # Return only the number sequence
-    # Drops the SOS and EOS
-    output = list(output.numpy()[0].astype("int16"))[1:-1]
+    pointer_index = attention_weights.numpy().argmax(-1)[0]
+    
+    encoder_input = encoder_input.numpy()
+    output = []
+    for pointer in pointer_index:
+      output.append(int(encoder_input[0, pointer]))
+    
+    output = output[:-1]
 
     return output, attention_weights
 
