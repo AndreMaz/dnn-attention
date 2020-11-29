@@ -42,6 +42,7 @@ INPUT_VOCAB = "\n0123456789/-., " + uniqueMonthLetters(first3Letters(MONTH_NAMES
 OUTPUT_LENGTH = 10; # Length of 'YYYY-MM-DD'.
 OUTPUT_VOCAB = "\n\t0123456789-"
 START_CODE = 1
+END_CODE = 0
 
 
 def toTwoDigitString(num: int) -> str:
@@ -220,3 +221,11 @@ def encodeOutputDateStrings(dateStrings: list):
 
     return x
 
+
+def decode_tensor(date_tensor, vocab):
+    date = ''
+
+    for index in date_tensor:
+        date = date + vocab[int(index)]
+
+    return date
